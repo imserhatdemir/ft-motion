@@ -1,0 +1,16 @@
+{
+  "name": "dotkesk",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "duration": 15,
+  "bpm": 128,
+  "speed": 1,
+  "subframes": 6,
+  "lang": "tr",
+  "fonts": {
+    "css": ["@fontsource/sora/latin-600.css", "@fontsource/sora/latin-ext-600.css", "@fontsource/sora/latin-700.css", "@fontsource/sora/latin-ext-700.css",
+            "@fontsource/inter/500.css", "@fontsource/inter/600.css", "@fontsource/inter/700.css", "@fontsource/jetbrains-mono/500.css"],
+    "preload": ["600 40px Sora", "700 40px Sora", "500 40px Inter", "600 40px Inter", "700 40px Inter", "500 20px \"JetBrains Mono\""]
+  }
+}

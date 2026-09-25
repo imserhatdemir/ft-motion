@@ -40,5 +40,6 @@ Requirements: Node 18+, Python 3.10+ with numpy and scipy, ffmpeg on PATH, and C
 - `ft.mjs`: CLI (static server, headless Chrome, ffmpeg).
 - `audio/ftsynth.py`: synthesis, timeline mixer, reverb, sidechain, mastering.
 - `examples/hello/`: reference scene using most techniques.
+- `examples/dotkesk/`: 15 s product showreel; the logo is rebuilt from measurements (`MEASURED`) and assembled from particles.
 - `examples/cat-crossing/`: three.js cartoon short (cel shading, ink lines, character rig, traffic, shot list).
 - `docs/TECHNIQUES.md`: recipes, with pointers into the example.

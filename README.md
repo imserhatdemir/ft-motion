@@ -107,6 +107,7 @@ audio/ftsynth.py      synthesis, timeline mixer, reverb, sidechain, mastering
 templates/blank/      starting point for `new`
 examples/hello/       reference scene + soundtrack
 examples/cat-crossing/ 3D cartoon short (three.js): a cat crossing a busy street
+examples/dotkesk/     15 s product showreel (Canvas 2D): chat UI, orbiting channels, logo assembled from dots
 docs/TECHNIQUES.md    recipes: timing, type, dot fields, morphs, UI, glass, impacts, sound
 prompts/              brief-to-video prompt templates (EN / TR)
 ```
