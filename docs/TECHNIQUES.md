@@ -72,6 +72,19 @@ Enabled by `boot()` for every render. Each frame averages `subframes` renders sp
 
 To animate a logo you must rebuild it procedurally: circles, ellipses, rings of dots, strokes. Measure proportions from the supplied file, render your version and the original side by side at the same scale, and iterate. If you can't match it, place the PNG/SVG with `ctx.drawImage` instead of approximating.
 
+## 3D with three.js (engine/three.js)
+
+For character animation and real 3D sets. *cat-crossing: the whole scene*
+
+- **Contract:** build meshes, lights and materials once in `setup(api)`; in `draw(ctx, t)` set *every* transform, material value and camera from `t`, then `gl.render(ctx, scene, camera)`. Don't read last frame's state. Motion blur calls `draw` several times per frame at nearby times, so anything accumulated breaks it.
+- **Cartoon look:** `toon(color, { rim })` is a `MeshToonMaterial` with a hard 3-step ramp and an optional rim light. `ink(mesh, width)` adds an inverted-hull outline that shares the mesh's geometry. Use smooth normals (spheres, capsules, `RoundedBoxGeometry`): hard box corners split the hull. Warm key light, cool hemisphere fill, soft shadows and a gradient sky dome keep it in "feature animation" territory.
+- **Characters from primitives:** nest groups (root → squash → rig → hip → head), pivot limbs at the joint, and drive every channel with keyframes `key(t, [[time, value, ease], …])` on the beat grid. Classic principles map to single numbers: squash & stretch (`wobble` on landings, stretch along hop arcs), anticipation (crouch + wiggle before a pounce), follow-through (the tail lags), exaggeration (eye scale, pupil size, fur puff).
+- **Gaits without state:** derive the walk phase from distance travelled along a keyframed path (sum `|Δz|` over sub-steps up to `t`), so feet never slide and the result is still a pure function of time.
+- **Tails, ropes, ribbons:** `new Sweep(n, radial)` is a tube with fixed topology; `update(points, radius(s))` re-poses it in place each frame.
+- **Traffic and other agents:** give each one a closed-form position `x(t)` (constant speed, or brake with constant deceleration to a stop line and pull away later). Velocity and acceleration come from finite differences, which also drive wheel spin, braking dive and speed stretch.
+- **Cameras:** a list of shots `[endTime, t => [position, lookAt, fov]]`; cutting on a frame boundary keeps motion-blur cuts hard.
+- **Speed:** SwiftShader renders roughly 0.5–1 s per subframe at 1080p. Cull what's off screen (`visible = false`), keep sphere segments modest, and use 3 subframes instead of 6.
+
 ## Sound (audio/ftsynth.py)
 
 - `Mix.from_project(__file__)` reads duration, bpm and speed.

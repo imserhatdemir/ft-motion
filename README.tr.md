@@ -59,6 +59,8 @@ Seçenekler: `--lang xx` (sahneye `api.lang` olarak geçer), `--sub N` (alt kare
 
 `project.json` içinde `bpm` ızgarayı belirler: `api.at(ölçü, adım)` sahne zamanını verir. `speed` ise bütün koreografiyi esnetir; `0.75` değeri 15 saniyelik bir kurguyu 20 saniyeye çıkarır ve ses de buna uyar.
 
+**three.js ile 3D sahneler:** Sahne `setup()` içinde bir three.js dünyası kurar ve `draw()` içinde onu `t` anına göre konumlar. [`engine/three.js`](engine/three.js) bu dünyayı ekran dışı bir WebGL tuvaline çizip kareye aktarır; hareket bulanıklığı, `post()` ve 2D katmanlar aynen çalışır. Headless render SwiftShader (yazılımsal WebGL) kullanır: sonuç her makinede aynıdır ama yavaştır, ağır 3D projelerde `subframes` değerini düşür. Örnek: [`examples/cat-crossing`](examples/cat-crossing) (caddeden karşıya geçmeye çalışan çizgi film kedisi).
+
 Teknik tarifler için [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md) dosyasına bak.
 
 ## Lisans

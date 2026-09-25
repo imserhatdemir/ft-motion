@@ -35,8 +35,10 @@ Requirements: Node 18+, Python 3.10+ with numpy and scipy, ffmpeg on PATH, and C
 ## Map
 
 - `engine/core.js`: math, easing, springs, type layout, shapes, dot fields, 3D projection, morphing, particles, glass, chromatic split, the motion-blur runtime (`boot`).
+- `engine/three.js`: three.js bridge (`createGL`, `toon`, `ink`, `Sweep`). 3D scenes build the world in `setup` and re-pose every object from `t` in `draw`; `three` and `three/addons/` resolve through the import map in `player.html`.
 - `engine/player.html`: loads a project's fonts and scene; used by both preview and render.
 - `ft.mjs`: CLI (static server, headless Chrome, ffmpeg).
 - `audio/ftsynth.py`: synthesis, timeline mixer, reverb, sidechain, mastering.
 - `examples/hello/`: reference scene using most techniques.
+- `examples/cat-crossing/`: three.js cartoon short (cel shading, ink lines, character rig, traffic, shot list).
 - `docs/TECHNIQUES.md`: recipes, with pointers into the example.

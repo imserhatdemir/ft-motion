@@ -9,6 +9,8 @@
   #hud { position: fixed; left: 10px; bottom: 6px; font: 12px ui-monospace, Menlo, Consolas, monospace; color: #8a8a8a; }
   #err { position: fixed; inset: 20px; color: #ff8a80; font: 14px ui-monospace, monospace; white-space: pre-wrap; }
 </style>
+<!-- bare "three" imports resolve from node_modules, so scenes and three/addons work unchanged -->
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
 </head>
 <body>
 <canvas id="c"></canvas>

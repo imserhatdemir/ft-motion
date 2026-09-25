@@ -1,0 +1,15 @@
+{
+  "name": "cat-crossing",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "duration": 24,
+  "bpm": 120,
+  "speed": 1,
+  "subframes": 3,
+  "lang": "tr",
+  "fonts": {
+    "css": ["@fontsource/fredoka/latin-600.css", "@fontsource/fredoka/latin-ext-600.css"],
+    "preload": ["600 40px Fredoka"]
+  }
+}
