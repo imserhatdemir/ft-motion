@@ -1,0 +1,14 @@
+{
+  "name": "hello",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "duration": 10,
+  "bpm": 120,
+  "speed": 1,
+  "subframes": 6,
+  "fonts": {
+    "css": ["@fontsource/inter/500.css", "@fontsource/inter/700.css", "@fontsource/jetbrains-mono/500.css"],
+    "preload": ["500 40px Inter", "700 40px Inter", "500 20px \"JetBrains Mono\""]
+  }
+}

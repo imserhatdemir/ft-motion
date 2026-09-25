@@ -1,0 +1,14 @@
+{
+  "name": "blank",
+  "width": 1080,
+  "height": 1080,
+  "fps": 60,
+  "duration": 15,
+  "bpm": 160,
+  "speed": 1,
+  "subframes": 6,
+  "fonts": {
+    "css": ["@fontsource/inter/500.css", "@fontsource/inter/700.css"],
+    "preload": ["500 40px Inter", "700 40px Inter"]
+  }
+}

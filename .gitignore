@@ -1,0 +1,9 @@
+node_modules/
+out/
+__pycache__/
+*.pyc
+*.mp4
+*.mov
+*.wav
+.DS_Store
+Thumbs.db

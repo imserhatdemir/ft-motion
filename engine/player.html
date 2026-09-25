@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ft-motion</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0b0c; }
+  canvas { position: absolute; inset: 0; margin: auto; max-width: 100vw; max-height: calc(100vh - 28px); }
+  #hud { position: fixed; left: 10px; bottom: 6px; font: 12px ui-monospace, Menlo, Consolas, monospace; color: #8a8a8a; }
+  #err { position: fixed; inset: 20px; color: #ff8a80; font: 14px ui-monospace, monospace; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<script type="module">
+// /engine/player.html?project=examples/hello[&lang=en][&t=3.5][&render=1]
+const qs = new URLSearchParams(location.search);
+const dir = (qs.get('project') || '').replace(/^\/+|\/+$/g, '');
+try {
+  const cfg = await (await fetch(`/${dir}/project.json`)).json();
+  // fonts: "@fontsource/inter/600.css" resolves from node_modules, anything else from the project folder
+  await Promise.all((cfg.fonts?.css ?? []).map(href => new Promise((ok, fail) => {
+    const l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href.startsWith('@') ? `/node_modules/${href}` : `/${dir}/${href}`;
+    l.onload = ok; l.onerror = () => fail(new Error(`font css not found: ${href}`));
+    document.head.append(l);
+  })));
+  const sample = cfg.fonts?.sample ?? 'AaBbÇçĞğİıÖöŞşÜüÄäÉéÑñß0123456789$€₺%·—›';
+  await Promise.all((cfg.fonts?.preload ?? []).map(spec => document.fonts.load(spec, sample)));
+  await document.fonts.ready;
+  const { boot } = await import('/engine/core.js');
+  const scene = (await import(`/${dir}/${cfg.scene ?? 'scene.js'}`)).default;
+  await boot(scene, cfg);
+} catch (e) {
+  window.__error = String(e.stack || e);
+  document.body.insertAdjacentHTML('beforeend', `<div id="err">${window.__error}</div>`);
+}
+</script>
+</body>
+</html>

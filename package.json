@@ -1,0 +1,22 @@
+{
+  "name": "ft-motion",
+  "version": "0.1.0",
+  "description": "Motion graphics as a pure function of time: Canvas 2D scenes, headless-Chrome rendering with motion blur, ffmpeg encoding and synthesized sound.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "preview": "node ft.mjs preview",
+    "stills": "node ft.mjs stills",
+    "sheet": "node ft.mjs sheet",
+    "render": "node ft.mjs render",
+    "new": "node ft.mjs new"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.0",
+    "@fontsource/jetbrains-mono": "^5.2.0",
+    "puppeteer-core": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
