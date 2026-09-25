@@ -100,14 +100,20 @@ Options: `--lang xx` (passed to the scene as `api.lang`), `--sub N` (motion-blur
 
 ```
 engine/core.js        helpers + motion-blur runtime
+engine/three.js       three.js bridge: offscreen WebGL, cel shading, ink outlines, sweep tubes
 engine/player.html    loads a project's fonts + scene (preview and render)
 ft.mjs                CLI: static server, headless Chrome, ffmpeg
 audio/ftsynth.py      synthesis, timeline mixer, reverb, sidechain, mastering
 templates/blank/      starting point for `new`
 examples/hello/       reference scene + soundtrack
+examples/cat-crossing/ 3D cartoon short (three.js): a cat crossing a busy street
 docs/TECHNIQUES.md    recipes: timing, type, dot fields, morphs, UI, glass, impacts, sound
 prompts/              brief-to-video prompt templates (EN / TR)
 ```
+
+## 3D scenes with three.js
+
+A scene can build a three.js world in `setup()` and pose it from `t` in `draw()`; [`engine/three.js`](engine/three.js) renders it into an offscreen WebGL canvas and blits it onto the frame, so motion blur, `post()` and 2D overlays keep working. `import * as THREE from 'three'` and `three/addons/…` resolve from `node_modules` through the player's import map. Headless renders use SwiftShader (software WebGL), which is deterministic but slow (roughly 0.5–1 s per subframe at 1080p), so lower `subframes` for heavy 3D projects. See [`examples/cat-crossing`](examples/cat-crossing) and the three.js section in [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md).
 
 ## Tips
 

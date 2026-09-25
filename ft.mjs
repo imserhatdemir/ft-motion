@@ -66,7 +66,7 @@ async function headless() {
   if (!chrome) die('Chrome/Chromium/Edge not found — set CHROME_PATH to its executable');
   let puppeteer;
   try { puppeteer = (await import('puppeteer-core')).default; } catch { die('run `npm install` first'); }
-  const browser = await puppeteer.launch({ executablePath: chrome, headless: true, args: ['--force-device-scale-factor=1', '--disable-gpu'] });
+  const browser = await puppeteer.launch({ executablePath: chrome, headless: true, args: ['--force-device-scale-factor=1', '--disable-gpu', '--enable-unsafe-swiftshader'] });
   const page = await browser.newPage();
   await page.setViewport({ width: cfg.width, height: cfg.height });
   page.on('pageerror', e => console.error('[scene error]', e.message));
