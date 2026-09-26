@@ -1,0 +1,22 @@
+{
+  "name": "chat-commerce",
+  "width": 1080,
+  "height": 1080,
+  "fps": 60,
+  "duration": 20,
+  "bpm": 160,
+  "speed": 0.75,
+  "subframes": 6,
+  "fonts": {
+    "css": [
+      "@fontsource/inter/500.css",
+      "@fontsource/inter/600.css",
+      "@fontsource/inter/700.css"
+    ],
+    "preload": [
+      "500 40px Inter",
+      "600 40px Inter",
+      "700 40px Inter"
+    ]
+  }
+}

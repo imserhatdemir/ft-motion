@@ -101,12 +101,15 @@ Options: `--lang xx` (passed to the scene as `api.lang`), `--sub N` (motion-blur
 ```
 engine/core.js        helpers + motion-blur runtime
 engine/three.js       three.js bridge: offscreen WebGL, cel shading, ink outlines, sweep tubes
+engine/brand.js       brand kit: palette from 3 colours, safe areas, text fitting, logo / monogram
 engine/player.html    loads a project's fonts + scene (preview and render)
 ft.mjs                CLI: static server, headless Chrome, ffmpeg
 audio/ftsynth.py      synthesis, timeline mixer, reverb, sidechain, mastering
 templates/blank/      starting point for `new`
 examples/hello/       reference scene + soundtrack
 examples/cat-crossing/ 3D cartoon short (three.js): a cat crossing a busy street
+examples/chat-commerce/ conversational-commerce promo: chat demo, manifesto, inbox, dots → logo, glass end card
+examples/motion-principles/ kinetic manifesto: code → dot landscape → timing, rhythm, contrast, squash, morph
 docs/TECHNIQUES.md    recipes: timing, type, dot fields, morphs, UI, glass, impacts, sound
 prompts/              brief-to-video prompt templates (EN / TR)
 ```
@@ -114,6 +117,16 @@ prompts/              brief-to-video prompt templates (EN / TR)
 ## 3D scenes with three.js
 
 A scene can build a three.js world in `setup()` and pose it from `t` in `draw()`; [`engine/three.js`](engine/three.js) renders it into an offscreen WebGL canvas and blits it onto the frame, so motion blur, `post()` and 2D overlays keep working. `import * as THREE from 'three'` and `three/addons/…` resolve from `node_modules` through the player's import map. Headless renders use SwiftShader (software WebGL), which is deterministic but slow (roughly 0.5–1 s per subframe at 1080p), so lower `subframes` for heavy 3D projects. See [`examples/cat-crossing`](examples/cat-crossing) and the three.js section in [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md).
+
+## Brandable examples
+
+[`examples/chat-commerce`](examples/chat-commerce) and [`examples/motion-principles`](examples/motion-principles) are 20-second promos (also templates in ft-studio). Everything a brand changes sits at the top of `scene.js`: the `COPY` dictionary (TR / EN, pick with `--lang tr`) and `BRAND` (three colours, display font, optional logo file). [`engine/brand.js`](engine/brand.js) turns those into a palette with guaranteed contrast, a safe area for any aspect ratio (change `width` / `height` in `project.json` for 9:16, 4:5 or 16:9) and a logo, with a monogram when there is no file. Both are choreographed on a 15 s clock and play at `"speed": 0.75`; set `1` for the original 15 s tempo or `0.6` for 25 s, and the soundtrack follows.
+
+```bash
+node ft.mjs sheet examples/chat-commerce 12 --lang tr
+python examples/chat-commerce/sound.py
+node ft.mjs render examples/chat-commerce --lang tr
+```
 
 ## Tips
 

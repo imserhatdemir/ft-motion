@@ -1,0 +1,22 @@
+{
+  "name": "motion-principles",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "duration": 20,
+  "bpm": 160,
+  "speed": 0.75,
+  "subframes": 6,
+  "fonts": {
+    "css": [
+      "@fontsource/archivo-black/400.css",
+      "@fontsource/inter/500.css",
+      "@fontsource/jetbrains-mono/500.css"
+    ],
+    "preload": [
+      "400 40px \"Archivo Black\"",
+      "500 40px Inter",
+      "500 20px \"JetBrains Mono\""
+    ]
+  }
+}

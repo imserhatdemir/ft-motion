@@ -61,6 +61,8 @@ Seçenekler: `--lang xx` (sahneye `api.lang` olarak geçer), `--sub N` (alt kare
 
 **three.js ile 3D sahneler:** Sahne `setup()` içinde bir three.js dünyası kurar ve `draw()` içinde onu `t` anına göre konumlar. [`engine/three.js`](engine/three.js) bu dünyayı ekran dışı bir WebGL tuvaline çizip kareye aktarır; hareket bulanıklığı, `post()` ve 2D katmanlar aynen çalışır. Headless render SwiftShader (yazılımsal WebGL) kullanır: sonuç her makinede aynıdır ama yavaştır, ağır 3D projelerde `subframes` değerini düşür. Örnek: [`examples/cat-crossing`](examples/cat-crossing) (caddeden karşıya geçmeye çalışan çizgi film kedisi).
 
+**Markaya uyarlanabilir örnekler:** [`examples/chat-commerce`](examples/chat-commerce) (sohbetle alışveriş tanıtımı) ve [`examples/motion-principles`](examples/motion-principles) (kinetik manifesto) 20 saniyelik tanıtım filmleri; ft-studio'da şablon olarak da var. Markanın değiştireceği her şey `scene.js`'in başında: `COPY` sözlüğü (TR / EN, `--lang tr` ile seçilir) ve `BRAND` (üç renk, başlık fontu, isteğe bağlı logo dosyası). [`engine/brand.js`](engine/brand.js) bunlardan kontrastı garanti bir palet, her en-boy oranı için güvenli alan (9:16, 4:5 ya da 16:9 için `project.json`'da `width` / `height` değiştir) ve logo üretir; logo yoksa monogram çizer. İkisi de 15 sn'lik bir saatte kurgulandı ve `"speed": 0.75` ile oynar: `1` orijinal 15 sn tempo, `0.6` 25 sn; ses de buna uyar.
+
 Teknik tarifler için [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md) dosyasına bak.
 
 ## Lisans
