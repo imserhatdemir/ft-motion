@@ -73,6 +73,8 @@ python examples/reel/sound.py
 node ft.mjs render examples/reel --lang tr
 ```
 
+**Düzenleme isteği, gerçek diff ve sonuç:** Sahne kod olduğu için bir revizyon okunabilir bir diff'tir. [`examples/edit-demo`](examples/edit-demo) tek bir gerçek turu gösterir: *"Reel'i 150 BPM'e çıkar ve vurgu rengini mercandan elektrik mavisine çevir. Ses senkronda kalsın."* isteği, bunu karşılayan [commit](https://github.com/imserhatdemir/ft-motion/compare/add-reel-techniques...demo/edit-150bpm-blue) ([`case/change.patch`](examples/edit-demo/case/change.patch)) ve önce/sonra videoları yan yana. `project.json`'daki tek bir sayı hem görüntüyü hem sesi yeniden zamanladı. Diff'in geri kalanı bunun kendiliğinden yetişmediği yerler: eski renge düşen yedi yardımcı, sabit yazılmış `128 BPM` etiketi, "900 kare" diyen metinler ve mutlak bir saniyeye bağlı tek bir ses olayı. Kendi düzenlemen için [README](examples/edit-demo/README.md)'ye bak.
+
 Teknik tarifler için [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md) dosyasına bak.
 
 ## Lisans
