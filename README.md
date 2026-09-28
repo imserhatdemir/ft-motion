@@ -111,6 +111,7 @@ audio/ftextras.py     stamp, counter ticks, echo, glitch burst
 templates/blank/      starting point for `new`
 examples/hello/       reference scene + soundtrack
 examples/reel/        15 s showcase reel: wipes, glitch, tunnel, dot sphere, easing graph, typed code (TR / EN)
+examples/edit-demo/   an edit request, its real git diff and the before / after renders side by side
 examples/cat-crossing/ 3D cartoon short (three.js): a cat crossing a busy street
 examples/chat-commerce/ conversational-commerce promo: chat demo, manifesto, inbox, dots → logo, glass end card
 examples/motion-principles/ kinetic manifesto: code → dot landscape → timing, rhythm, contrast, squash, morph
@@ -146,6 +147,14 @@ node ft.mjs sheet examples/reel 16 --lang en
 python examples/reel/sound.py
 node ft.mjs render examples/reel --lang en
 ```
+
+## An edit request, the real diff, and the result
+
+Because a scene is code, a revision is a diff you can read. [`examples/edit-demo`](examples/edit-demo) walks through one real round: the request *"Speed the reel up to 150 BPM and change the accent colour from coral to electric blue. Keep the sound in sync."*, the [commit](https://github.com/imserhatdemir/ft-motion/compare/add-reel-techniques...demo/edit-150bpm-blue) that answered it (saved as [`case/change.patch`](examples/edit-demo/case/change.patch)), and the before and after renders side by side. One number in `project.json` retimed the picture and the sound. The rest of the diff is what that did not reach on its own: seven helpers that default to the old colour, a hard-coded `128 BPM` label, copy quoting `900 frames`, and one sound event at an absolute second.
+
+![Frames from the reel before and after the edit](docs/edit-demo-compare.jpg)
+
+The 30 s side-by-side video is itself an ft-motion project (the panel is drawn from `case/`, and `compose.mjs` overlays the two renders). See its [README](examples/edit-demo/README.md) to make one for your own edit.
 
 ## Tips
 

@@ -1,0 +1,22 @@
+{
+  "name": "edit-demo",
+  "width": 1080,
+  "height": 1350,
+  "fps": 60,
+  "duration": 30.2,
+  "bpm": 120,
+  "speed": 1,
+  "subframes": 3,
+  "shutter": 0.5,
+  "fonts": {
+    "css": [
+      "@fontsource/inter/500.css",
+      "@fontsource/inter/700.css",
+      "@fontsource/jetbrains-mono/500.css",
+      "@fontsource/jetbrains-mono/700.css",
+      "@fontsource/barlow-condensed/800.css"
+    ],
+    "preload": ["500 40px Inter", "700 40px Inter", "500 40px 'JetBrains Mono'", "700 40px 'JetBrains Mono'", "800 40px 'Barlow Condensed'"],
+    "sample": "AaBbÇçĞğİıÖöŞşÜüÄäÉéÑñß0123456789$€₺%·—›→▸✓×=<>+−…“”"
+  }
+}
