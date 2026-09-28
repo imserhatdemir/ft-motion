@@ -48,3 +48,4 @@ Requirements: Node 18+, Python 3.10+ with numpy and scipy, ffmpeg on PATH, and C
 - `examples/cat-crossing/`: three.js cartoon short (cel shading, ink lines, character rig, traffic, shot list).
 - `examples/chat-commerce/`, `examples/motion-principles/`: brandable 20 s promos (ported from ft-studio templates): copy in `COPY`, brand in `BRAND`, layout against `brandApi().fmt.safe`, 15 s choreography played at `speed` 0.75.
 - `docs/TECHNIQUES.md`: recipes, with pointers into the example.
+- `docs/sound-and-tempo.html`: standalone interactive explainer (EN default, TR toggle) of how `ftsynth` builds each sound and how scenes lock to the beat grid. Copy lives in the `I` dictionary; the DSP mirrors `audio/ftsynth.py`, so change both together.

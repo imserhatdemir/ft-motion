@@ -115,6 +115,7 @@ examples/cat-crossing/ 3D cartoon short (three.js): a cat crossing a busy street
 examples/chat-commerce/ conversational-commerce promo: chat demo, manifesto, inbox, dots → logo, glass end card
 examples/motion-principles/ kinetic manifesto: code → dot landscape → timing, rhythm, contrast, squash, morph
 docs/TECHNIQUES.md    recipes: timing, type, dot fields, morphs, UI, glass, impacts, sound
+docs/sound-and-tempo.html  interactive explainer: how the sound is synthesised, how motion locks to the beat (EN / TR)
 prompts/              brief-to-video prompt templates (EN / TR)
 ```
 
@@ -137,6 +138,8 @@ node ft.mjs render examples/chat-commerce --lang tr
 ![Contact sheet of examples/reel](docs/reel-preview.jpg)
 
 [`examples/reel`](examples/reel) is a 15 s, 128 BPM reel that puts [`engine/fx.js`](engine/fx.js) and [`engine/recipes.js`](engine/recipes.js) to work: nine scenes with skew / bars / disc wipes, a glitch tear, a tunnel that punches on the kick, a dot sphere, an easing-curve explainer, a rippling dot grid, kinetic type, and finally the reel's own source typing itself, rendering, and playing in a preview inside the preview. Copy is in `COPY` (`--lang tr` / `--lang en`), and the sound track ([`sound.py`](examples/reel/sound.py), using [`audio/ftextras.py`](audio/ftextras.py)) mirrors every camera hit.
+
+**How the sound is made and how the picture locks to the tempo** is explained with live demos in [`docs/sound-and-tempo.html`](docs/sound-and-tempo.html) (English, with a Turkish toggle). Open it in a browser: a loop you can play and re-tempo, the kick, hat, pluck and riser formulas with sliders, the three mixer moves (sidechain, reverb, tanh drive), and the reel's real hit list scrubbed against three motion recipes. It is a single static file that needs no build step.
 
 ```bash
 node ft.mjs sheet examples/reel 16 --lang en
