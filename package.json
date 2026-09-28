@@ -21,5 +21,9 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "author": {
+    "name": "Serhat Demir",
+    "email": "serhatdemir1235@gmail.com"
   }
 }
