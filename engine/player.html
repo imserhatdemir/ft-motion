@@ -18,7 +18,8 @@
 <script type="module">
 // /engine/player.html?project=examples/hello[&lang=en][&t=3.5][&render=1]
 const qs = new URLSearchParams(location.search);
-const dir = (qs.get('project') || '').replace(/^\/+|\/+$/g, '');
+const dir = (qs.get('project') || '').replace(/^\/+|\/+$/g, '')
+  .split('/').filter(seg => seg && seg !== '.' && seg !== '..').join('/');
 try {
   const cfg = await (await fetch(`/${dir}/project.json`)).json();
   // fonts: "@fontsource/inter/600.css" resolves from node_modules, anything else from the project folder
