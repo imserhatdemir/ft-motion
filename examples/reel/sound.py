@@ -1,4 +1,4 @@
-"""examples/reel: soundtrack on the same grid as scene.js (128 BPM, A minor, bar = 1.875 s).
+"""examples/reel: soundtrack on the same grid as scene.js (150 BPM, A minor, bar = 1.6 s).
 Run:  python examples/reel/sound.py   →  examples/reel/out/audio.wav
 
 Arrangement (beats):  0–4 hook: only text slams · 4–12 groove builds · 12–20 the drop · 20–28 code (filtered, sparse) · 28–32 resolve.
@@ -86,6 +86,6 @@ stamp(m, b(29), 196, 0.85)                                                      
 for i, n in enumerate([93, 88, 84, 91, 88, 81]):
     m.add(b(28) + 0.22 + i * 0.235, pluck(midi(n), dec=0.9), 0.1 * (1 - i * 0.1), -0.5 if i % 2 else 0.5, 0.45)
 m.typing(b(30), b(30) + 0.6, 28, gain=0.1)
-m.add(14.4, bell(midi(96), 1.0), 0.06, 0.2, 0.5)                                    # tinkle on the "?" wiggle
+m.add(b(30.7), bell(midi(96), 1.0), 0.06, 0.2, 0.5)                                    # tinkle on the "?" wiggle
 
 m.render(peak=0.74)
