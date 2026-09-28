@@ -100,13 +100,17 @@ Options: `--lang xx` (passed to the scene as `api.lang`), `--sub N` (motion-blur
 
 ```
 engine/core.js        helpers + motion-blur runtime
+engine/fx.js          transitions, glitch, bloom, aberration, HUD, code window
+engine/recipes.js     tunnel, dot sphere, easing graph, ripple dots
 engine/three.js       three.js bridge: offscreen WebGL, cel shading, ink outlines, sweep tubes
 engine/brand.js       brand kit: palette from 3 colours, safe areas, text fitting, logo / monogram
 engine/player.html    loads a project's fonts + scene (preview and render)
 ft.mjs                CLI: static server, headless Chrome, ffmpeg
 audio/ftsynth.py      synthesis, timeline mixer, reverb, sidechain, mastering
+audio/ftextras.py     stamp, counter ticks, echo, glitch burst
 templates/blank/      starting point for `new`
 examples/hello/       reference scene + soundtrack
+examples/reel/        15 s showcase reel: wipes, glitch, tunnel, dot sphere, easing graph, typed code (TR / EN)
 examples/cat-crossing/ 3D cartoon short (three.js): a cat crossing a busy street
 examples/chat-commerce/ conversational-commerce promo: chat demo, manifesto, inbox, dots → logo, glass end card
 examples/motion-principles/ kinetic manifesto: code → dot landscape → timing, rhythm, contrast, squash, morph
@@ -128,6 +132,18 @@ python examples/chat-commerce/sound.py
 node ft.mjs render examples/chat-commerce --lang tr
 ```
 
+## Showcase reel
+
+![Contact sheet of examples/reel](docs/reel-preview.jpg)
+
+[`examples/reel`](examples/reel) is a 15 s, 128 BPM reel that puts [`engine/fx.js`](engine/fx.js) and [`engine/recipes.js`](engine/recipes.js) to work: nine scenes with skew / bars / disc wipes, a glitch tear, a tunnel that punches on the kick, a dot sphere, an easing-curve explainer, a rippling dot grid, kinetic type, and finally the reel's own source typing itself, rendering, and playing in a preview inside the preview. Copy is in `COPY` (`--lang tr` / `--lang en`), and the sound track ([`sound.py`](examples/reel/sound.py), using [`audio/ftextras.py`](audio/ftextras.py)) mirrors every camera hit.
+
+```bash
+node ft.mjs sheet examples/reel 16 --lang en
+python examples/reel/sound.py
+node ft.mjs render examples/reel --lang en
+```
+
 ## Tips
 
 - Leave film grain out. It multiplies file size and every platform re-encodes it into blotches.
@@ -136,4 +152,4 @@ node ft.mjs render examples/chat-commerce --lang tr
 
 ## License
 
-MIT (see [LICENSE](LICENSE)). Fonts are distributed under their own licenses (Inter and JetBrains Mono: SIL Open Font License).
+MIT (see [LICENSE](LICENSE)). Fonts are distributed under their own licenses (Inter, JetBrains Mono and Barlow Condensed: SIL Open Font License).

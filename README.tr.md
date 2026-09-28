@@ -63,8 +63,16 @@ Seçenekler: `--lang xx` (sahneye `api.lang` olarak geçer), `--sub N` (alt kare
 
 **Markaya uyarlanabilir örnekler:** [`examples/chat-commerce`](examples/chat-commerce) (sohbetle alışveriş tanıtımı) ve [`examples/motion-principles`](examples/motion-principles) (kinetik manifesto) 20 saniyelik tanıtım filmleri; ft-studio'da şablon olarak da var. Markanın değiştireceği her şey `scene.js`'in başında: `COPY` sözlüğü (TR / EN, `--lang tr` ile seçilir) ve `BRAND` (üç renk, başlık fontu, isteğe bağlı logo dosyası). [`engine/brand.js`](engine/brand.js) bunlardan kontrastı garanti bir palet, her en-boy oranı için güvenli alan (9:16, 4:5 ya da 16:9 için `project.json`'da `width` / `height` değiştir) ve logo üretir; logo yoksa monogram çizer. İkisi de 15 sn'lik bir saatte kurgulandı ve `"speed": 0.75` ile oynar: `1` orijinal 15 sn tempo, `0.6` 25 sn; ses de buna uyar.
 
+**Vitrin reel'i:** [`examples/reel`](examples/reel), [`engine/fx.js`](engine/fx.js) ve [`engine/recipes.js`](engine/recipes.js) modüllerini çalıştıran 15 saniyelik, 128 BPM'lik bir reel: eğik / çubuk / daire geçişleri, glitch, kick'le vuran tünel, nokta küre, easing eğrisi anlatımı, dalgalanan nokta ızgarası, kinetik tipografi ve son olarak reel'in kendi kodunun yazılıp render edilmesi (önizlemenin içinde önizleme). Metinler `COPY` içinde (`--lang tr` / `--lang en`); ses ([`sound.py`](examples/reel/sound.py), [`audio/ftextras.py`](audio/ftextras.py)) her kamera vuruşunu yansıtır.
+
+```bash
+node ft.mjs sheet examples/reel 16 --lang tr
+python examples/reel/sound.py
+node ft.mjs render examples/reel --lang tr
+```
+
 Teknik tarifler için [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md) dosyasına bak.
 
 ## Lisans
 
-MIT ([LICENSE](LICENSE)). Fontlar kendi lisanslarıyla dağıtılır (Inter ve JetBrains Mono: SIL Open Font License).
+MIT ([LICENSE](LICENSE)). Fontlar kendi lisanslarıyla dağıtılır (Inter, JetBrains Mono ve Barlow Condensed: SIL Open Font License).

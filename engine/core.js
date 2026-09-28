@@ -299,6 +299,7 @@ export async function boot(scene, cfg) {
   window.frameCount = Math.round(DUR * FPS);
   window.renderFrame = (f, S = cfg.subframes ?? 6) => {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    api.frameT = (SPEED * f) / FPS;            // un-blurred time of this frame (for counters and text that must stay sharp)
     for (let s = 0; s < S; s++) {
       drawAt(wctx, (SPEED * (f + (S > 1 ? (s / S) * shutter : 0))) / FPS);
       ctx.globalAlpha = 1 / (s + 1);
