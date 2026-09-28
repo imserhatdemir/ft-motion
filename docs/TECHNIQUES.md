@@ -27,6 +27,8 @@ Each recipe says what it's for, which helpers to use, and where it runs in [`exa
 
 Enabled by `boot()` for every render. Each frame averages `subframes` renders spread over a forward half-frame shutter (180°), so hard cuts on frame boundaries stay hard. Preview it live with `b`. It costs nothing in scene code: just keep `draw()` a pure function of `t`.
 
+**Keeping things sharp.** Anything that changes value every frame (a counter, a timecode, a progress percentage) smears into ghost digits when averaged. Draw those from `api.frameT`, the un-blurred time of the frame being rendered, instead of `t`, or draw them in `post()`, which already receives that time. *reel: the "900" counter, the terminal, `hud()`*
+
 ## Kinetic type
 
 - **Masked rise:** clip to a line box, then draw the text offset by `(1 - p) * size`. Size the clip box to include descenders and diacritics; `maskedText()` pads for you. Letter-by-letter reveals use `layout()` (kerning-preserving x offsets) with `ctx.fillText(ch, x0 + L.xs[i], y)`. *hello: intro()*
@@ -68,6 +70,38 @@ Enabled by `boot()` for every render. Each frame averages `subframes` renders sp
 - `shake(t, [[time, px], …])`: noise-driven camera shake that decays.
 - A flash or colour wash over the frame, fading in about 0.1–0.5 s.
 
+## Transitions and overlays (engine/fx.js)
+
+Coloured shapes that cover the frame and uncover it again. Draw them **after** the scene and switch scenes at `mid`, when the frame is fully covered. *reel: `transitions()`*
+
+- `transition(ctx, W, H, t, { mid, color, stripe, cover: { kind, dur, … }, reveal: { … } })` schedules one cover → reveal pair around `mid`. `kind` is `'skew'` (a slanted wipe; `axis`, `dir`, optional contrasting `stripe`), `'bars'` (staggered columns) or `'disc'` (a circle growing from `at: [x, y]`). Cover eases in-out so it lands exactly on `mid`; reveal eases out.
+- **A becomes B, literally:** make the disc grow from a shape of the previous scene (the dot of a question mark) and the cut disappears. *reel: hook → easing*
+- Vary the kind, direction and colour between neighbouring cuts; alternate light and dark scenes so each wipe has something to reveal.
+- `flash()` and `shockRing()` for hard cuts on a drop: a 3-frame flash plus a ring that thins as it expands.
+- `glitch(ctx, W, H, t, t0)` tears horizontal slices of whatever is already on the canvas and sprinkles hairlines. Call it last in `draw()`; it peaks around `t0` and re-rolls 30 times a second, deterministically.
+- `aberrate(ctx, W, H, px)` is a lens-style RGB split done on pixels (stronger toward the edges), with `aberrationAt(t, hits)` for the decay. Use it in `post()` on the biggest hits only; use core's `chromatic()` when you want to split a single element.
+- `bloom(ctx, W, H)` adds a blurred, downscaled copy of the frame with `screen`. Keep `alpha` below about 0.2, or blacks turn milky. (Film grain is still off the menu; see Rendering gotchas.)
+- `hud(ctx, api, t, opts)` is a crisp editor-style frame (timecode, frame counter, progress bar, scene label). It costs nothing to keep on screen and makes a reel feel like a working file. Call it from `post()`.
+
+## Recipes (engine/recipes.js)
+
+Whole visual ideas as functions. Each takes explicit arguments and colours, so reuse means changing an argument, not copying code. *reel: one per scene*
+
+- `tunnel(ctx, W, H, phase, t, opts)` + `surge(t, beat)`: an infinite zoom through nested rounded squares. Layers keep their identity while travelling outward (colour and twist come from the layer's global index), inner ones fade in. `surge()` shoves the phase forward half a layer on every beat, so the camera punches with the kick.
+- `dotSphere(ctx, cx, cy, R, { yaw, tilt, band, pulse, satellite })`: a fibonacci lattice of dots that reads as a solid ball (dark disc behind, dim back dots, bright front dots), a latitude band that lights up, orbit rings and a satellite with a trail. Put big outlined type behind it for depth.
+- `easingGraph(ctx, x, y, size, { cp, handles, drawn, ball, pop })`: explains a cubic-bezier: grid, handles, the curve drawing itself and a ball riding it with dashed projections. Animate `cp` from linear to the target and the curve visibly bends. Returns the eased value for a readout.
+- `rippleDots(ctx, cx, cy, t, launches, opts)`: a dot grid with beat-launched ripples (built on `grid()` and `ripple()`), including the expanding ring outlines.
+
+## Code on screen (engine/fx.js)
+
+Making the tool visible is a strong closing move: the video shows its own source, then its own render. *reel: scene 8*
+
+- `windowFrame(ctx, x, y, w, h, title)` draws a soft-shadowed window with a title bar; draw content inside at `y + 46`.
+- `typeCode(ctx, x, y, lines, n)` types syntax-highlighted code (`[[text, role], …]` per line, roles `kw fn p v n str cm`) with line numbers and a caret. `n` is `(t - t0) * charsPerSecond`. `codeLength(lines)` gives the total for timing.
+- **A preview inside the preview:** clip to a window's content area, scale, and call another scene's draw function with a looping local time. Because scenes are pure functions of `t`, that is all it takes.
+- Show the pipeline: a terminal window with the real command (`node ft.mjs render …`) and a progress bar driven from `api.frameT`.
+- `fitFont(ctx, text, maxW, maxPx, weight, family, trackingEm)` returns the largest size that fits; use it in `setup()` so translated copy (EN/TR) never overflows.
+
 ## Logo fidelity
 
 To animate a logo you must rebuild it procedurally: circles, ellipses, rings of dots, strokes. Measure proportions from the supplied file, render your version and the original side by side at the same scale, and iterate. If you can't match it, place the PNG/SVG with `ctx.drawImage` instead of approximating.
@@ -92,6 +126,8 @@ For character animation and real 3D sets. *cat-crossing: the whole scene*
 - Harmony: `m.pad(t, chord('Em9'), dur=m.bar)`, one chord per bar and the brightest on the lockup.
 - UI foley: `pop()`, `keyclick()` (`m.typing(t0, t1, chars)`), `mouseclick()`, `blip()`, `pluck()` (pitched per event, e.g. ascending per letter), `bell()`.
 - Movement: `m.whoosh(t, dur, f0, f1)` for passes, `m.riser(t0, t1)` and `m.suck(t0, t1)`, which end *exactly* on `t1`, `m.roll(t0, t1)`, `m.impact(t)`.
+- `audio/ftextras.py` adds `stamp(m, t, pitch)` (a text slam: pitched tom + short kick, so pads duck), `counter_ticks(m, t0, dur, n)` (ticks that slow like an expo-out counter), `echo(m, t, sig)` (ping-pong repeats through `m.add`), `glitch_burst()` and `tick()`, `tom()`. *reel/sound.py*
+- **Arrange by subtraction.** Drop the kick for the beat before a drop (and before the finale) so the next hit lands harder, and make the code section quieter than the drop so the stamped words cut through.
 - `m.render()` applies reverb, sidechain and soft-clip, writes `out/audio.wav`, and prints integrated LUFS and true peak (aim for about -14 LUFS and ≤ -1 dBFS).
 
 ## Rendering gotchas
