@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sound and Tempo Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: one 1040px column; every section is a heading + short lead + one live panel; plots and lanes read their colours from the tokens below. */
+:root {
+  --bg: #0b0b0f; --panel: #14141a; --panel2: #1c1c24; --line: rgba(242,237,228,.13);
+  --fg: #f2ede4; --mute: #a0a0ab; --accent: #ff6b3d; --accent2: #ffb547; --onaccent: #140c08;
+  --display: 'Barlow Condensed', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+  --body: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) { --bg: #edeef1; --panel: #ffffff; --panel2: #e4e6eb; --line: rgba(11,11,15,.14); --fg: #0b0b0f; --mute: #5c5d67; --accent: #e5522b; --accent2: #a86800; --onaccent: #ffffff; color-scheme: light; }
+}
+:root[data-theme="light"] { --bg: #edeef1; --panel: #ffffff; --panel2: #e4e6eb; --line: rgba(11,11,15,.14); --fg: #0b0b0f; --mute: #5c5d67; --accent: #e5522b; --accent2: #a86800; --onaccent: #ffffff; color-scheme: light; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; padding-inline: 18px; padding-block: 28px 64px; }
+main { max-width: 1040px; margin-inline: auto; display: flex; flex-direction: column; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 800; line-height: .98; margin: 0; text-wrap: balance; letter-spacing: -.005em; }
+h1 { font-size: clamp(46px, 9vw, 96px); }
+h2 { font-size: clamp(34px, 5.4vw, 54px); }
+h3 { font-size: 26px; font-weight: 700; line-height: 1.05; }
+p { margin: 0; }
+code, pre, .mono { font-family: var(--mono); }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.lead { color: var(--mute); max-width: 66ch; font-size: 17px; }
+.sec { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.sec > header { display: flex; flex-direction: column; gap: 12px; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+.lang button { font: 700 12px var(--mono); letter-spacing: .08em; border: 0; background: transparent; color: var(--mute); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+.lang button[aria-pressed="true"] { background: var(--accent); color: var(--onaccent); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; min-width: 0; }
+canvas { display: block; width: 100%; }
+a { color: var(--accent); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn { font: 600 15px var(--body); background: var(--accent); color: var(--onaccent); border: 0; border-radius: 999px; padding: 10px 20px; cursor: pointer; min-width: 112px; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn:hover { filter: brightness(1.08); }
+.controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+.ctl { display: flex; flex-direction: column; gap: 4px; min-width: 150px; flex: 1 1 150px; }
+.ctl label { font: 700 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--mute); display: flex; justify-content: space-between; gap: 8px; }
+.ctl label output { color: var(--fg); }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.nums { display: flex; flex-wrap: wrap; gap: 8px 26px; font: 500 13px var(--mono); color: var(--mute); }
+.nums b { color: var(--fg); font-weight: 700; }
+
+/* step lanes */
+.lanes { display: flex; flex-direction: column; gap: 6px; }
+.lane { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 8px; align-items: center; }
+.lane > span { font: 700 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.cells { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 3px; min-width: 0; }
+.cells button { min-width: 0; overflow: hidden; height: 30px; border: 0; border-radius: 4px; background: var(--panel2); cursor: pointer; padding: 0; }
+.cells button:nth-child(4n+1) { margin-left: 5px; }
+.cells button:nth-child(4n+1):first-child { margin-left: 0; }
+.cells button.on { background: var(--lc); }
+.cells button.now { box-shadow: inset 0 0 0 2px var(--fg); }
+
+/* cards */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
+.card { display: flex; flex-direction: column; gap: 12px; }
+.card p { color: var(--mute); font-size: 15px; }
+.card canvas { height: 132px; background: var(--panel2); border-radius: 10px; }
+.card .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+pre { margin: 0; background: var(--panel2); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.6; overflow-x: auto; color: var(--fg); }
+
+.plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.plot { display: flex; flex-direction: column; gap: 10px; }
+.plot canvas { height: 150px; background: var(--panel2); border-radius: 10px; }
+.plot p { font-size: 14px; color: var(--mute); }
+.plot h3 { font-size: 22px; }
+
+/* rules + pipeline */
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.rule { display: flex; flex-direction: column; gap: 8px; border-top: 2px solid var(--accent); padding-top: 12px; }
+.rule p { color: var(--mute); font-size: 15px; }
+.rule code { color: var(--fg); font-size: 13px; background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+.tl canvas { height: 210px; }
+.lab { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.lab .panel { display: flex; flex-direction: column; gap: 10px; }
+.lab canvas { height: 200px; background: var(--panel2); border-radius: 10px; }
+.pipe { display: flex; flex-direction: column; gap: 14px; }
+.lane2 { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+.step { flex: 1 1 130px; background: var(--panel2); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.step b { font: 700 13px var(--mono); }
+.step span { font-size: 13.5px; color: var(--mute); }
+.arrow { align-self: center; color: var(--accent); font: 700 18px var(--mono); }
+.pipe h3 { font-family: var(--mono); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; color: var(--mute); }
+.links { display: flex; flex-wrap: wrap; gap: 8px 18px; font: 500 14px var(--mono); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (max-width: 520px) { .lane { grid-template-columns: minmax(0, 1fr); gap: 3px; } .arrow { display: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header class="sec">
+    <div class="top">
+      <span class="eyebrow">ft-motion · examples/reel</span>
+      <div class="lang" role="group" aria-label="Language"><button id="l-en" type="button">EN</button><button id="l-tr" type="button">TR</button></div>
+    </div>
+    <h1 data-i="h1"></h1>
+    <p class="lead" data-i="lead0"></p>
+  </header>
+
+  <!-- live loop -->
+  <section class="sec" id="canli">
+    <header>
+      <span class="eyebrow" data-i="liveEye"></span>
+      <h2 data-i="liveH"></h2>
+      <p class="lead" data-i="liveLead"></p>
+    </header>
+    <div class="panel" style="display:flex;flex-direction:column;gap:16px">
+      <canvas id="hero" style="height:230px"></canvas>
+      <div class="lanes" id="lanes"></div>
+      <div class="controls">
+        <button class="btn" id="play" type="button"></button>
+        <div class="ctl" style="max-width:340px"><label for="bpm"><span data-i="tempo"></span> <output id="bpmO"></output></label><input id="bpm" type="range" min="80" max="170" value="128"></div>
+        <div class="nums"><span><span data-i="nBeatL"></span> <b id="nBeat"></b></span><span><span data-i="nBarL"></span> <b id="nBar"></b></span><span><span data-i="nStepL"></span> <b id="nStep"></b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- instruments -->
+  <section class="sec" id="ses">
+    <header>
+      <span class="eyebrow" data-i="sndEye"></span>
+      <h2 data-i="sndH"></h2>
+      <p class="lead" data-i="sndLead"></p>
+    </header>
+    <div class="grid2" id="cards"></div>
+  </section>
+
+  <!-- mixer -->
+  <section class="sec" id="mikser">
+    <header>
+      <span class="eyebrow" data-i="mixEye"></span>
+      <h2 data-i="mixH"></h2>
+      <p class="lead" data-i="mixLead"></p>
+    </header>
+    <div class="panel" style="display:flex;flex-direction:column;gap:16px">
+      <div class="controls">
+        <button class="btn" id="play2" type="button"></button>
+        <div class="ctl"><label for="duck"><span data-i="duckL"></span> <output id="duckO"></output></label><input id="duck" type="range" min="0" max="90" value="55"></div>
+        <div class="ctl"><label for="rev"><span data-i="revL"></span> <output id="revO"></output></label><input id="rev" type="range" min="0" max="100" value="30"></div>
+        <div class="ctl"><label for="drive"><span data-i="driveL"></span> <output id="driveO"></output></label><input id="drive" type="range" min="10" max="40" value="13"></div>
+      </div>
+      <div class="plots">
+        <div class="plot"><h3 data-i="duckT"></h3><canvas id="pDuck"></canvas><p data-i="duckP"></p></div>
+        <div class="plot"><h3 data-i="irT"></h3><canvas id="pIR"></canvas><p data-i="irP"></p></div>
+        <div class="plot"><h3 data-i="driveT"></h3><canvas id="pDrive"></canvas><p data-i="driveP"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- motion -->
+  <section class="sec" id="hareket">
+    <header>
+      <span class="eyebrow" data-i="motEye"></span>
+      <h2 data-i="motH"></h2>
+      <p class="lead" data-i="motLead"></p>
+    </header>
+    <div class="rules">
+      <div class="rule"><h3 data-i="r1t"></h3><p data-i="r1p"></p></div>
+      <div class="rule"><h3 data-i="r2t"></h3><p data-i="r2p"></p></div>
+      <div class="rule"><h3 data-i="r3t"></h3><p data-i="r3p"></p></div>
+      <div class="rule"><h3 data-i="r4t"></h3><p data-i="r4p"></p></div>
+      <div class="rule"><h3 data-i="r5t"></h3><p data-i="r5p"></p></div>
+    </div>
+    <div class="panel tl" style="display:flex;flex-direction:column;gap:14px">
+      <div class="controls">
+        <button class="btn ghost" id="labPlay" type="button"></button>
+        <div class="ctl" style="flex:2 1 260px"><label for="scrub"><span data-i="timeL"></span> <output id="scrubO"></output></label><input id="scrub" type="range" min="0" max="3199" value="1200"></div>
+        <div class="nums"><span><span data-i="totalL"></span> <b id="nTotal"></b></span></div>
+      </div>
+      <canvas id="tl"></canvas>
+      <p class="lead" style="font-size:14px" data-i="tlNote"></p>
+    </div>
+    <div class="lab">
+      <div class="panel"><h3 data-i="lab1"></h3><canvas id="lab1"></canvas><pre data-i="lab1c"></pre></div>
+      <div class="panel"><h3 data-i="lab2"></h3><canvas id="lab2"></canvas><pre data-i="lab2c"></pre></div>
+      <div class="panel"><h3 data-i="lab3"></h3><canvas id="lab3"></canvas><pre data-i="lab3c"></pre></div>
+    </div>
+  </section>
+
+  <!-- pipeline -->
+  <section class="sec" id="hat">
+    <header>
+      <span class="eyebrow" data-i="pipeEye"></span>
+      <h2 data-i="pipeH"></h2>
+    </header>
+    <div class="panel pipe">
+      <h3 data-i="pipePic"></h3>
+      <div class="lane2">
+        <div class="step"><b>scene.js</b><span data-i="s1"></span></div><span class="arrow">→</span>
+        <div class="step"><b data-i="s2t"></b><span data-i="s2"></span></div><span class="arrow">→</span>
+        <div class="step"><b>post()</b><span data-i="s3"></span></div><span class="arrow">→</span>
+        <div class="step"><b>900 PNG</b><span data-i="s4"></span></div>
+      </div>
+      <h3 data-i="pipeSnd"></h3>
+      <div class="lane2">
+        <div class="step"><b>sound.py</b><span data-i="s5"></span></div><span class="arrow">→</span>
+        <div class="step"><b>numpy</b><span data-i="s6"></span></div><span class="arrow">→</span>
+        <div class="step"><b>render()</b><span data-i="s7"></span></div><span class="arrow">→</span>
+        <div class="step"><b>audio.wav</b><span data-i="s8"></span></div>
+      </div>
+      <h3 data-i="pipeMerge"></h3>
+      <div class="lane2"><div class="step"><b>ffmpeg</b><span data-i="s9"></span></div></div>
+    </div>
+    <div class="links">
+      <a href="../audio/ftsynth.py">audio/ftsynth.py</a><a href="../audio/ftextras.py">audio/ftextras.py</a><a href="../examples/reel/sound.py">examples/reel/sound.py</a><a href="../examples/reel/scene.js">examples/reel/scene.js</a><a href="TECHNIQUES.md">docs/TECHNIQUES.md</a>
+    </div>
+  </section>
+</main>
+
+<script>
+'use strict';
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, t) => a + (b - a) * t;
+const outExpo = x => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const midi = m => 440 * Math.pow(2, (m - 69) / 12);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const state = { bpm: 128, duck: 0.55, rev: 0.3, drive: 1.3 };
+
+/* ───────── copy: English is the main language, Turkish is kept ───────── */
+const I = {
+  en: {
+    title: 'Sound and Tempo Lab',
+    h1: 'Sound and motion run on the same clock',
+    lead0: 'The 15-second reel has one tempo: 128 BPM. The sound is synthesised from scratch in Python; the picture is drawn as a pure function of time. Both read the same beat grid, so sync is not adjusted by hand. It just holds.',
+    liveEye: 'Live loop', liveH: 'One clock, two outputs',
+    liveLead: 'The picture and the sound below are fed by the same number: elapsed time <code>t</code>. Press Play, change the tempo, click the cells to write your own rhythm. The sound is made in your browser with the formulas the reel uses.',
+    play: 'Play', stop: 'Stop', tempo: 'Tempo',
+    nBeatL: 'beat = 60 / BPM =', nBarL: 'bar = 4 beats =', nStepL: 'step = beat / 4 =', unitS: 's',
+    heroBeat: 'beat', heroStep: 'step', step: 'step',
+    sndEye: 'How the sound is made', sndH: 'No recordings, no samples, only maths',
+    sndLead: 'Each sound is a few lines of formula: a wave, a decay curve, sometimes filtered noise. Move the sliders, watch the waveform change, press play. The snippets summarise the functions in <code>audio/ftsynth.py</code>.',
+    mixEye: 'Mixer', mixH: 'Three moves so the sounds don\'t crush each other',
+    mixLead: 'Sounds that are fine alone turn muddy when stacked. <code>Mix.render()</code> does three things. Change the sliders while the loop plays and hear the difference.',
+    duckL: 'Sidechain', revL: 'Reverb', driveL: 'Drive',
+    duckT: 'Sidechain', irT: 'Reverb', driveT: 'Master',
+    duckP: 'Every time the kick hits, the pads and bass drop in level and recover within 0.11 s. The kick breathes instead of fighting for space.',
+    irP: 'A decaying burst of noise becomes the "room". Sounds are convolved with it. It is 2.6 s long with everything above 5.5 kHz removed.',
+    driveP: 'Everything is summed, then passed through a <code>tanh</code> curve. Peaks squeeze softly, so the mix sounds strong without clipping.',
+    duckAx: 'pad and bass level', kickWord: 'kick', irAx: 'exp(-t / 0.55) · 2.6 s', wetWord: 'wet', inOut: 'in → out',
+    motEye: 'How motion follows the tempo', motH: 'Time is counted in beats, not seconds',
+    motLead: 'Every time value in the scene is written as "which beat". Change the tempo and picture and sound scale together. Five rules keep it that way.',
+    r1t: 'One clock', r1p: '<code>draw(ctx, t)</code> depends only on <code>t</code>, and <code>t = frame / 60</code>. No randomness, no accumulated state, so the same <code>t</code> always gives the same frame.',
+    r2t: 'Time written in beats', r2p: '<code>b(n) = n × 60 / BPM</code>. At 128 BPM a beat is 0.469 s. Scene changes happen at <code>b(4)</code>, <code>b(12)</code>, <code>b(28)</code> and so on.',
+    r3t: 'One hit list', r3p: 'The reel has a <code>HITS</code> list. The camera shakes from it and <code>sound.py</code> puts a sound on the same hits. Both sides read the same list.',
+    r4t: 'Motion tied to hits', r4p: 'The tunnel is pushed half a layer forward on every beat, ripples are born on beats, and words rise out of their masks on the downbeat.',
+    r5t: 'A choreography that stretches', r5p: 'Change <code>speed</code> or the BPM and the frames and the sound stretch or shrink by the same ratio. Zero manual fixes.',
+    silent: 'Silent play', pause: 'Pause', timeL: 'Time', beatsU: 'beats', totalL: 'reel length = 32 beats =',
+    tlNote: 'Scenes on top, the summed camera hits in the middle, the sounds placed on the same hits below. Drag the slider: the three frames underneath are drawn for that moment. The same time value gives the same frame every time.',
+    scenes: ['hook', 'easing', 'morph', 'rhythm', 'type', 'tunnel', 'sphere', 'code', 'end'], camL: 'CAMERA (picture)', sndL: 'SOUND (same hits)',
+    lab1: 'Camera hit', lab2: 'Tunnel push', lab3: 'Ripple born on the beat',
+    lab1c: 's = 1 + 0.03 · strength · exp(-9 · (t - hit))', lab2c: 'phase = 1.1·t + 0.5·(⌊beat⌋ + outExpo(frac))', lab3c: 'weight = exp(-((distance - speed·age)/width)²)',
+    scaleL: 'scale', shakeL: 'shake', phaseL: 'phase',
+    pipeEye: 'End to end', pipeH: 'Two lanes, one meeting point', pipePic: 'Picture', pipeSnd: 'Sound', pipeMerge: 'Merge',
+    s1: 'draw(ctx, t) is called for every frame', s2t: '8 subframes', s2: 'averaged over a 0.7-frame shutter: motion blur', s3: 'crisp HUD, bloom, aberration, vignette', s4: 'headless Chrome, 60 fps',
+    s5: 'every event is written as a beat and step', s6: 'each sound is generated from a formula and placed in time', s7: 'reverb, sidechain, tanh, peak and LUFS check', s8: '48 kHz, −15.3 LUFS, −1.2 dBTP',
+    s9: 'PNG sequence + wav → H.264 / AAC mp4, 15.000 s',
+  },
+  tr: {
+    title: 'Ses ve Tempo Atölyesi',
+    h1: 'Ses de hareket de aynı saatten çıkıyor',
+    lead0: '15 saniyelik reel\'de tek bir tempo var: 128 BPM. Ses Python\'da sıfırdan sentezleniyor, görüntü zamanın saf bir fonksiyonu olarak çiziliyor. İkisi de aynı vuruş ızgarasını okuyor. Senkron elle ayarlanmıyor, kendiliğinden tutuyor.',
+    liveEye: 'Canlı döngü', liveH: 'Tek saat, iki çıktı',
+    liveLead: 'Aşağıdaki resim ve ses aynı sayıdan beslenir: geçen süre <code>t</code>. Çal\'a bas, tempoyu değiştir, kutulara tıklayıp kendi ritmini yaz. Ses tarayıcında, reel\'in kullandığı formüllerle üretilir.',
+    play: 'Çal', stop: 'Durdur', tempo: 'Tempo',
+    nBeatL: 'vuruş = 60 / BPM =', nBarL: 'ölçü = 4 vuruş =', nStepL: 'adım = vuruş / 4 =', unitS: 's',
+    heroBeat: 'vuruş', heroStep: 'adım', step: 'adım',
+    sndEye: 'Ses nasıl üretiliyor', sndH: 'Kayıt yok, örnek yok, sadece matematik',
+    sndLead: 'Her ses birkaç satırlık formül: bir dalga, bir sönüm eğrisi, bazen filtrelenmiş gürültü. Kaydırıcıları oynat, dalganın nasıl değiştiğini gör, çal. Kodlar <code>audio/ftsynth.py</code> içindeki fonksiyonların özeti.',
+    mixEye: 'Mikser', mixH: 'Sesler birbirini ezmesin diye üç hamle',
+    mixLead: 'Tek tek iyi duyulan sesler üst üste binince çamurlaşır. <code>Mix.render()</code> üç şey yapıyor. Döngü çalarken kaydırıcıları değiştir, farkı hemen duyarsın.',
+    duckL: 'Sidechain', revL: 'Yankı (reverb)', driveL: 'Doygunluk (drive)',
+    duckT: 'Sidechain', irT: 'Yankı', driveT: 'Master',
+    duckP: 'Kick her vurduğunda pad ve bas ses seviyesi düşer, 0,11 sn içinde geri gelir. Kick nefes alır, boşlukta kalmaz.',
+    irP: 'Sönen bir gürültü dizisi "oda" olur. Sesler bu diziyle çarpılır (konvolüsyon). 2,6 sn uzunlukta, 5,5 kHz üstü kesilmiş.',
+    driveP: 'Her şey toplanınca <code>tanh</code> eğrisinden geçer. Tepe noktalar yumuşakça sıkışır, ses patlamadan güçlü duyulur.',
+    duckAx: 'pad ve bas seviyesi', kickWord: 'kick', irAx: 'exp(-t / 0.55) · 2,6 sn', wetWord: 'yankı', inOut: 'giriş → çıkış',
+    motEye: 'Hareket nasıl tempoya uyuyor', motH: 'Zaman vuruşla ölçülür, saniyeyle değil',
+    motLead: 'Sahnedeki her zaman değeri "kaçıncı vuruş" olarak yazılır. Tempo değişince görüntü ve ses birlikte ölçeklenir. Bunu beş kural sağlıyor.',
+    r1t: 'Tek saat', r1p: '<code>draw(ctx, t)</code> sadece <code>t</code>\'ye bağlı. <code>t = kare / 60</code>. Rastgelelik ve birikmiş durum yok, aynı <code>t</code> her zaman aynı kareyi verir.',
+    r2t: 'Vuruşla yazılan zaman', r2p: '<code>b(n) = n × 60 / BPM</code>. 128 BPM\'de bir vuruş 0,469 sn. Sahne geçişleri <code>b(4)</code>, <code>b(12)</code>, <code>b(28)</code> gibi noktalarda olur.',
+    r3t: 'Tek vuruş listesi', r3p: 'Reel\'de <code>HITS</code> listesi var. Kamera bu listeye göre sarsılır, <code>sound.py</code> aynı vuruşlara ses koyar. İki taraf aynı listeyi okur.',
+    r4t: 'Vuruşa bağlı hareket', r4p: 'Tünel her vuruşta yarım katman ileri itilir, dalgalar vuruşta doğar, yazılar ölçü başında maskeden çıkar.',
+    r5t: 'Esneyen koreografi', r5p: '<code>speed</code> ve BPM değişince hem kareler hem ses aynı oranda uzar veya kısalır. Sıfır elle düzeltme.',
+    silent: 'Sessiz oynat', pause: 'Duraklat', timeL: 'Zaman', beatsU: 'vuruş', totalL: 'reel süresi = 32 vuruş =',
+    tlNote: 'Üstte sahneler, ortada kamera vuruşlarının toplam şiddeti, altta aynı vuruşlara konan sesler. Kaydırıcıyı sürükle: aşağıdaki üç kare o ana göre çizilir. Aynı zaman değeri her seferinde aynı kareyi verir.',
+    scenes: ['kanca', 'easing', 'morph', 'ritim', 'tipografi', 'tünel', 'küre', 'kod', 'final'], camL: 'KAMERA (görüntü)', sndL: 'SES (aynı vuruşlar)',
+    lab1: 'Kamera vuruşu', lab2: 'Tünel itmesi', lab3: 'Vuruşta doğan dalga',
+    lab1c: 's = 1 + 0.03 · şiddet · exp(-9 · (t - vuruş))', lab2c: 'faz = 1.1·t + 0.5·(⌊vuruş⌋ + outExpo(kesir))', lab3c: 'ağırlık = exp(-((uzaklık - hız·yaş)/genişlik)²)',
+    scaleL: 'ölçek', shakeL: 'sarsıntı', phaseL: 'faz',
+    pipeEye: 'Baştan sona', pipeH: 'İki hat, tek buluşma noktası', pipePic: 'Görüntü', pipeSnd: 'Ses', pipeMerge: 'Birleşme',
+    s1: 'draw(ctx, t) her karede çağrılır', s2t: '8 alt kare', s2: '0,7 kare açıklığında ortalanır: hareket bulanıklığı', s3: 'net HUD, bloom, aberration, vinyet', s4: 'headless Chrome, 60 fps',
+    s5: 'her olay vuruş ve adım olarak yazılır', s6: 'her ses formülden üretilip zamana yerleştirilir', s7: 'yankı, sidechain, tanh, tepe ve LUFS ölçümü', s8: '48 kHz, −15,3 LUFS, −1,2 dBTP',
+    s9: 'PNG dizisi + wav → H.264 / AAC mp4, 15,000 sn',
+  },
+};
+let lang = 'en';
+try { const s = localStorage.getItem('ft-lang'); if (s === 'tr' || s === 'en') lang = s; } catch (e) { /* storage may be blocked */ }
+if (location.hash === '#tr') lang = 'tr'; else if (location.hash === '#en') lang = 'en';
+const T = k => I[lang][k] ?? I.en[k];
+const L2 = o => o[lang];
+
+/* ───────── theme colours for canvas (read from the CSS tokens) */
+const C = {};
+function readTheme() { const cs = getComputedStyle(document.documentElement); ['bg', 'panel', 'panel2', 'line', 'fg', 'mute', 'accent', 'accent2'].forEach(k => (C[k] = cs.getPropertyValue('--' + k).trim())); }
+readTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { readTheme(); redrawStatic(); });
+new MutationObserver(() => { readTheme(); redrawStatic(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+function fit(cv) {
+  const r = cv.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2), w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(d, 0, 0, d, 0, 0); return [ctx, r.width, r.height];
+}
+const mono = (ctx, px, w = 500) => (ctx.font = `${w} ${px}px 'JetBrains Mono', ui-monospace, Menlo, monospace`);
+const num = (v, d) => (lang === 'tr' ? v.toFixed(d).replace('.', ',') : v.toFixed(d));
+
+/* ───────── DSP: the same formulas as audio/ftsynth.py, in JavaScript */
+let SR = 44100, seed = 1234567;
+const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+function noise(n) { const x = new Float32Array(n); for (let i = 0; i < n; i++) x[i] = (rand() + rand() + rand() - 1.5) * 1.6; return x; }
+function biq(x, type, fc, Q = 0.7071) {
+  const n = x.length, y = new Float32Array(n), w = 2 * Math.PI * fc / SR, cw = Math.cos(w), al = Math.sin(w) / (2 * Q);
+  let b0, b1, b2;
+  if (type === 'hp') { b0 = (1 + cw) / 2; b1 = -(1 + cw); b2 = b0; } else if (type === 'lp') { b0 = (1 - cw) / 2; b1 = 1 - cw; b2 = b0; } else { b0 = al; b1 = 0; b2 = -al; }
+  const a0 = 1 + al, a1 = -2 * cw / a0, a2 = (1 - al) / a0; b0 /= a0; b1 /= a0; b2 /= a0;
+  let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+  for (let i = 0; i < n; i++) { const v = x[i], o = b0 * v + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; y[i] = o; x2 = x1; x1 = v; y2 = y1; y1 = o; }
+  return y;
+}
+function mkKick({ f0 = 165, f1 = 45, dec = 0.34, click = 0.5 } = {}) {
+  const n = Math.floor(dec * 4 * SR), s = new Float32Array(n), nz = biq(noise(n), 'hp', 1800); let ph = 0;
+  for (let i = 0; i < n; i++) { const t = i / SR; ph += 2 * Math.PI * (f1 + (f0 - f1) * Math.exp(-t / 0.032)) / SR; s[i] = Math.tanh((Math.sin(ph) * Math.exp(-t / dec) + nz[i] * Math.exp(-t / 0.0025) * click) * 1.8); }
+  return s;
+}
+function mkHat({ dec = 0.026, fc = 7500 } = {}) {
+  const n = Math.floor(Math.max(dec * 7, 0.03) * SR), y = biq(biq(noise(n), 'hp', fc, 0.54), 'hp', fc, 1.31);
+  for (let i = 0; i < n; i++) y[i] *= Math.exp(-i / SR / dec); return y;
+}
+function mkSnare() {
+  const n = Math.floor(0.4 * SR), body = biq(biq(noise(n), 'hp', 1100), 'lp', 7500), cl = biq(biq(noise(n), 'hp', 900), 'lp', 2600), y = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / SR; let env = 0; for (const d of [0, 0.008, 0.017]) if (t >= d) env += Math.exp(-(t - d) / 0.006);
+    y[i] = body[i] * Math.exp(-t / 0.12) + cl[i] * env * 0.8 + Math.sin(2 * Math.PI * 190 * t) * Math.exp(-t / 0.045) * 0.7;
+  } return y;
+}
+function mkPluck({ note = 69, dec = 0.32 } = {}) {
+  const f = midi(note), n = Math.floor(dec * 5 * SR), y = new Float32Array(n); let ph = 0;
+  for (let i = 0; i < n; i++) { const t = i / SR; ph += 2 * Math.PI * f / SR; y[i] = (Math.sin(ph) + 0.3 * Math.sin(2 * ph) * Math.exp(-t / 0.08) + 0.12 * Math.sin(3 * ph) * Math.exp(-t / 0.04)) * Math.exp(-t / dec) * (1 - Math.exp(-t / 0.0015)); }
+  return y;
+}
+function mkBass(note = 33) {
+  const f = midi(note), n = Math.floor(0.34 * SR), y = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const t = i / SR; y[i] = Math.tanh(1.6 * (Math.sin(2 * Math.PI * f * t) + 0.25 * Math.sin(4 * Math.PI * f * t))) * Math.exp(-t / 0.2) * Math.min(1, t / 0.006); }
+  return y;
+}
+function mkRiser({ dur = 1.2, f0 = 250, f1 = 9000 } = {}) {
+  const n = Math.floor(dur * SR), y = new Float32Array(n), x = noise(n); let x1 = 0, x2 = 0, y1 = 0, y2 = 0, ph = 0, pk = 1e-9;
+  for (let c = 0; c < n; c += 256) {
+    const fc = f0 * Math.pow(f1 / f0, c / n), w = 2 * Math.PI * fc / SR, cw = Math.cos(w), al = Math.sin(w) / (2 * 1.1), a0 = 1 + al, b0 = al / a0, b2 = -al / a0, a1 = -2 * cw / a0, a2 = (1 - al) / a0;
+    for (let i = c; i < Math.min(n, c + 256); i++) { const v = x[i], o = b0 * v + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = v; y2 = y1; y1 = o; y[i] = o; pk = Math.max(pk, Math.abs(o)); }
+  }
+  const tone = new Float32Array(n);
+  for (let i = 0; i < n; i++) { ph += 2 * Math.PI * 110 * Math.pow(4, i / n) / SR; tone[i] = Math.sin(ph); }
+  const tl = biq(tone, 'lp', 3000);
+  for (let i = 0; i < n; i++) { const e = Math.pow(i / n, 2); y[i] = (y[i] / pk + tl[i] * 0.3) * e * 0.8; }
+  return y;
+}
+const arrBuf = new WeakMap();
+
+/* ───────── audio engine (created on the first click) */
+let ac = null, dry, duckBus, duckGain, revSend, conv, wet, shaper, outG;
+function initAudio() {
+  if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+  ac = new (window.AudioContext || window.webkitAudioContext)(); SR = ac.sampleRate;
+  dry = ac.createGain(); duckBus = ac.createGain(); duckGain = ac.createGain(); revSend = ac.createGain(); conv = ac.createConvolver(); wet = ac.createGain(); shaper = ac.createWaveShaper(); outG = ac.createGain();
+  shaper.oversample = '2x'; outG.gain.value = 0.8;
+  dry.connect(shaper); duckBus.connect(duckGain); duckGain.connect(shaper); revSend.connect(conv); conv.connect(wet); wet.connect(shaper); shaper.connect(outG); outG.connect(ac.destination);
+  const n = Math.floor(2.6 * SR), ir = ac.createBuffer(2, n, SR);
+  for (let c = 0; c < 2; c++) { let x = noise(n); for (let i = 0; i < n; i++) x[i] *= Math.exp(-i / SR / 0.55); x = biq(x, 'lp', 5500); x.fill(0, 0, Math.floor(0.015 * SR)); ir.copyToChannel(x, c); }
+  conv.buffer = ir; setDrive(); wet.gain.value = state.rev; buildBank();
+}
+function setDrive() { if (!shaper) return; const N = 2048, cv = new Float32Array(N), d = state.drive; for (let i = 0; i < N; i++) { const x = i / (N - 1) * 2 - 1; cv[i] = Math.tanh(d * x) / Math.tanh(d); } shaper.curve = cv; }
+function toBuf(arr) { let b = arrBuf.get(arr); if (!b) { b = ac.createBuffer(1, arr.length, SR); b.copyToChannel(arr, 0); arrBuf.set(arr, b); } return b; }
+function hit(arr, when, gain = 1, pan = 0, bus = 'dry', send = 0) {
+  const src = ac.createBufferSource(), g = ac.createGain(); src.buffer = toBuf(arr); g.gain.value = gain; src.connect(g);
+  let node = g; if (pan) { const p = ac.createStereoPanner(); p.pan.value = pan; g.connect(p); node = p; }
+  node.connect(bus === 'dry' ? dry : duckBus);
+  if (send) { const sg = ac.createGain(); sg.gain.value = send; node.connect(sg); sg.connect(revSend); }
+  src.start(Math.max(when, ac.currentTime));
+}
+
+/* ───────── the loop: one bar of A minor, 16 steps */
+const TONES = [57, 60, 64, 69], PAT = [0, 2, 1, 3, 2, 1, 3, 2, 0, 2, 1, 3, 2, 3, 1, 2], ACC = [1, .5, .7, .5, .9, .5, .7, .5, 1, .5, .7, .5, .9, .5, .8, .6];
+const LANES = [['kick', 'Kick', '--accent'], ['snare', 'Snare', '--accent2'], ['hat', 'Hat', '--mute'], ['arp', 'Arp', '--fg']];
+const pat = { kick: [0, 4, 8, 12], snare: [4, 12], hat: [2, 6, 10, 14], arp: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] };
+const on = (lane, i) => pat[lane].includes(i);
+let bank = null;
+function buildBank() { bank = { kick: mkKick(), snare: mkSnare(), hat: mkHat(), bass: mkBass(33), arp: TONES.map(n => mkPluck({ note: n + 12, dec: 0.22 })) }; }
+function pad(when, dur) {
+  const out = ac.createGain(), lp = ac.createBiquadFilter(), hp = ac.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = 1500; hp.type = 'highpass'; hp.frequency.value = 95;
+  out.gain.setValueAtTime(0, when); out.gain.linearRampToValueAtTime(0.06, when + 0.3); out.gain.setValueAtTime(0.06, when + dur); out.gain.setTargetAtTime(0, when + dur, 0.14);
+  out.connect(lp); lp.connect(hp); hp.connect(duckBus);
+  for (const m of [57, 60, 64]) for (const cents of [-9, 0, 9]) { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = midi(m); o.detune.value = cents; o.connect(out); o.start(when); o.stop(when + dur + 1); }
+}
+let playing = false, t0 = 0, nextStep = 0, timer = null, idle0 = performance.now();
+const stepDur = () => 15 / state.bpm;
+function playStep(s, when) {
+  if (on('kick', s)) { hit(bank.kick, when, 0.9); duckGain.gain.setValueAtTime(1 - state.duck, when); duckGain.gain.setTargetAtTime(1, when, 0.11); hit(bank.bass, when + 0.01, 0.5, 0, 'duck'); }
+  if (on('snare', s)) hit(bank.snare, when, 0.5, 0.05, 'dry', 0.35);
+  if (on('hat', s)) hit(bank.hat, when + (s % 2 ? 0.006 : 0), 0.14 * (s % 2 ? 0.6 : 1), 0.25, 'dry', 0.25);
+  if (on('arp', s)) hit(bank.arp[PAT[s]], when, 0.22 * ACC[s], s % 2 ? -0.4 : 0.4, 'dry', 0.3);
+  if (s === 0) pad(when, 16 * stepDur());
+}
+function pump() { const st = stepDur(); while (t0 + nextStep * st < ac.currentTime + 0.18) { playStep(nextStep % 16, t0 + nextStep * st); nextStep++; } }
+function setPlayLabel() { $('#play').textContent = $('#play2').textContent = playing ? T('stop') : T('play'); }
+function togglePlay() {
+  initAudio();
+  if (playing) { playing = false; clearInterval(timer); }
+  else { playing = true; t0 = ac.currentTime + 0.08; nextStep = 0; duckGain.gain.cancelScheduledValues(0); duckGain.gain.value = 1; pump(); timer = setInterval(pump, 25); }
+  setPlayLabel();
+}
+$('#play').onclick = $('#play2').onclick = togglePlay;
+/* the visual clock: audio time when playing, a silent free-running clock otherwise */
+function heroT() { return playing ? Math.max(0, ac.currentTime - t0) : RM ? 0.3 : (performance.now() - idle0) / 1000; }
+
+function setBpm(v) {
+  if (playing) { const pos = (ac.currentTime - t0) / stepDur(); state.bpm = v; t0 = ac.currentTime - pos * stepDur(); } else state.bpm = v;
+  const b = 60 / v, u = T('unitS'); $('#bpmO').textContent = v + ' BPM'; $('#nBeat').textContent = num(b, 3) + ' ' + u; $('#nBar').textContent = num(4 * b, 3) + ' ' + u; $('#nStep').textContent = num(b / 4, 3) + ' ' + u;
+  $('#nTotal').textContent = num(32 * b, 1) + ' ' + u; drawTimeline();
+}
+$('#bpm').oninput = e => setBpm(+e.target.value);
+
+/* lanes UI */
+const lanesEl = $('#lanes');
+LANES.forEach(([k, name, col]) => {
+  const row = document.createElement('div'); row.className = 'lane'; row.innerHTML = `<span>${name}</span><div class="cells" style="--lc:var(${col})"></div>`;
+  const cells = $('.cells', row);
+  for (let i = 0; i < 16; i++) { const b = document.createElement('button'); b.type = 'button'; b.dataset.k = k; b.dataset.i = i; b.dataset.n = name; if (on(k, i)) b.classList.add('on'); b.onclick = () => { const a = pat[k], j = a.indexOf(i); if (j >= 0) a.splice(j, 1); else a.push(i); b.classList.toggle('on'); }; cells.append(b); }
+  lanesEl.append(row);
+});
+const cellEls = $$('.cells button');
+function labelCells() { cellEls.forEach(b => b.setAttribute('aria-label', `${b.dataset.n} ${T('step')} ${+b.dataset.i + 1}`)); }
+let lastStep = -1;
+function markStep(s) { if (s === lastStep) return; lastStep = s; cellEls.forEach(b => b.classList.toggle('now', +b.dataset.i === s)); }
+
+/* hero canvas: a pure function of t */
+function drawHero(t) {
+  const [ctx, w, h] = fit($('#hero')); ctx.clearRect(0, 0, w, h);
+  const beat = 60 / state.bpm, step = beat / 4, tb = t / beat, age = (tb - Math.floor(tb)) * beat, sFloat = t / step, cur = ((Math.floor(sFloat) % 16) + 16) % 16;
+  const cx = Math.min(130, w * 0.24), cy = h * 0.5;
+  for (let k = 0; k < 3; k++) { const a = age + k * beat; const p = a / (beat * 3); if (p > 1) continue; ctx.strokeStyle = C.accent; ctx.globalAlpha = (1 - p) * 0.7; ctx.lineWidth = 3 * (1 - p) + 0.5; ctx.beginPath(); ctx.arc(cx, cy, lerp(44, h * 0.46, 1 - Math.pow(1 - p, 2)), 0, 7); ctx.stroke(); }
+  ctx.globalAlpha = 1; ctx.fillStyle = C.accent; ctx.beginPath(); ctx.arc(cx, cy, 44 * (1 + 0.3 * Math.exp(-age * 9)), 0, 7); ctx.fill();
+  const bx = cx + 120, bw = w - bx - 8, gap = 4, cw = (bw - gap * 15) / 16, base = h - 44, maxH = h - 84;
+  for (let i = 0; i < 16; i++) {
+    const a = ((((sFloat - i) % 16) + 16) % 16) * step, n = LANES.filter(l => on(l[0], i)).length, e = n ? n / 4 * Math.exp(-a * 6) : 0;
+    ctx.fillStyle = i === cur ? C.accent : C.fg; ctx.globalAlpha = i === cur ? 1 : 0.28 + 0.55 * clamp(e * 2);
+    const bh = 5 + maxH * clamp(e + 0.06); ctx.fillRect(bx + i * (cw + gap), base - bh, cw, bh);
+  }
+  ctx.globalAlpha = 1; ctx.fillStyle = C.mute; mono(ctx, 12, 700);
+  for (let q = 0; q < 4; q++) ctx.fillText(String(q + 1), bx + q * 4 * (cw + gap), base + 18);
+  ctx.fillStyle = C.fg; mono(ctx, 13, 700); ctx.fillText(`t = ${num(t, 3)} ${T('unitS')}`, 14, h - 16); ctx.fillStyle = C.mute; ctx.fillText(`${T('heroBeat')} ${Math.floor(tb) % 4 + 1} · ${T('heroStep')} ${cur + 1}`, 14 + 128, h - 16);
+  markStep(cur);
+}
+
+/* ───────── instrument cards */
+const CARDS = [
+  { id: 'kick', name: { en: 'Kick', tr: 'Kick' },
+    text: { en: 'A sine wave drops fast in pitch, from 165 Hz to 45 Hz. That drop is the thump. A short noise click sits on top and the whole thing is squeezed softly with tanh.', tr: 'Bir sinüs dalgası hızla alçalır: 165 Hz\'den 45 Hz\'e. Bu düşüş "gümm" hissini verir. Üstüne kısa bir gürültü tıkı biner, tanh ile yumuşakça sıkıştırılır.' },
+    params: [['f0', { en: 'Start Hz', tr: 'Başlangıç Hz' }, 80, 260, 165, 1], ['f1', { en: 'End Hz', tr: 'Bitiş Hz' }, 30, 70, 45, 1], ['dec', { en: 'Decay s', tr: 'Sönüm sn' }, 0.1, 0.6, 0.34, 0.01], ['click', { en: 'Click', tr: 'Tık' }, 0, 1, 0.5, 0.05]],
+    code: { en: 'f   = f1 + (f0 - f1) · exp(-t / 0.032)\nsnd = sin(2π · ∫f dt) · exp(-t / dec)\nout = tanh((snd + click) · 1.8)', tr: 'f  = f1 + (f0 - f1) · exp(-t / 0.032)\nses = sin(2π · ∫f dt) · exp(-t / dec)\nout = tanh((ses + tık) · 1.8)' }, make: p => mkKick(p), gain: 0.9 },
+  { id: 'hat', name: { en: 'Hi-hat', tr: 'Hi-hat' },
+    text: { en: 'White noise, a fourth-order high-pass filter and a very short decay. No melody, only brightness and a sense of rhythm.', tr: 'Beyaz gürültü, dördüncü derece bir yüksek geçiren filtre ve çok kısa bir sönüm. Melodisi yok, sadece parlaklık ve ritim hissi.' },
+    params: [['dec', { en: 'Decay s', tr: 'Sönüm sn' }, 0.01, 0.15, 0.026, 0.001], ['fc', { en: 'Filter Hz', tr: 'Filtre Hz' }, 3000, 11000, 7500, 100]],
+    code: { en: 'noise = white_noise()\nhat   = highpass(noise, 7500, order=4)\nout   = hat · exp(-t / 0.026)', tr: 'gürültü = beyaz_gürültü()\nhat = highpass(gürültü, 7500, derece=4)\nout = hat · exp(-t / 0.026)' }, make: p => mkHat(p), gain: 0.5 },
+  { id: 'pluck', name: { en: 'Pluck (arp)', tr: 'Pluck (arp)' },
+    text: { en: 'A fundamental plus two harmonics. The harmonics die faster than the fundamental, so the note starts bright and turns soft.', tr: 'Bir temel ses ve iki harmonik. Harmonikler temelden daha hızlı söner, bu yüzden nota önce parlak başlar, sonra yumuşar.' },
+    params: [['note', { en: 'Note (MIDI)', tr: 'Nota (MIDI)' }, 45, 84, 69, 1], ['dec', { en: 'Decay s', tr: 'Sönüm sn' }, 0.08, 0.9, 0.32, 0.01]],
+    code: { en: 'snd = sin(φ) + 0.3·sin(2φ)·exp(-t/0.08)\n            + 0.12·sin(3φ)·exp(-t/0.04)\nout = snd · exp(-t / dec)', tr: 'ses = sin(φ) + 0.3·sin(2φ)·exp(-t/0.08)\n            + 0.12·sin(3φ)·exp(-t/0.04)\nout = ses · exp(-t / dec)' }, make: p => mkPluck(p), gain: 0.35 },
+  { id: 'riser', name: { en: 'Riser', tr: 'Riser' },
+    text: { en: 'Noise passes through a narrow band that slides from 250 Hz to 9 kHz. Level grows with x² and ends exactly on the downbeat. Hear the impact yourself.', tr: 'Gürültü, 250 Hz\'den 9 kHz\'e kayan dar bir banttan geçer. Seviye x² ile büyür ve tam vuruşun ilk anında biter. Vuruşu (impact) kendin duy.' },
+    params: [['dur', { en: 'Length s', tr: 'Süre sn' }, 0.6, 2.4, 1.2, 0.1], ['f0', { en: 'Start Hz', tr: 'Başlangıç Hz' }, 150, 600, 250, 10], ['f1', { en: 'End Hz', tr: 'Bitiş Hz' }, 3000, 12000, 9000, 100]],
+    code: { en: 'band_centre = f0 · (f1 / f0) ^ (t / length)\nsnd = band(noise) · (t / length)²\nimpact = end_of_riser   # lands on the beat', tr: 'bant_merkezi = f0 · (f1 / f0) ^ (t / süre)\nses = bant(gürültü) · (t / süre)²\nimpact = süre_sonu   # vuruş tam bitişte' }, make: p => mkRiser(p), gain: 0.6 },
+];
+const cardState = {};
+CARDS.forEach(c => (cardState[c.id] = Object.fromEntries(c.params.map(p => [p[0], p[4]]))));
+const NN = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'], noteName = m => NN[m % 12] + (Math.floor(m / 12) - 1);
+const cardsEl = $('#cards');
+function buildCards() {
+  cardsEl.innerHTML = '';
+  CARDS.forEach(c => {
+    const el = document.createElement('article'), st0 = cardState[c.id]; el.className = 'panel card';
+    el.innerHTML = `<h3>${L2(c.name)}</h3><p>${L2(c.text)}</p><canvas id="cv-${c.id}"></canvas>
+      <div class="controls">${c.params.map(p => `<div class="ctl"><label for="${c.id}-${p[0]}">${L2(p[1])} <output id="${c.id}-${p[0]}-o">${c.id === 'pluck' && p[0] === 'note' ? noteName(st0[p[0]]) : st0[p[0]]}</output></label><input id="${c.id}-${p[0]}" type="range" min="${p[2]}" max="${p[3]}" step="${p[5]}" value="${st0[p[0]]}"></div>`).join('')}</div>
+      <div class="row"><button class="btn" type="button" id="btn-${c.id}">${T('play')}</button></div><pre>${L2(c.code)}</pre>`;
+    cardsEl.append(el);
+    c.params.forEach(p => { $('#' + c.id + '-' + p[0]).oninput = e => { cardState[c.id][p[0]] = +e.target.value; $('#' + c.id + '-' + p[0] + '-o').textContent = c.id === 'pluck' && p[0] === 'note' ? noteName(+e.target.value) : e.target.value; drawCard(c); }; });
+    $('#btn-' + c.id).onclick = () => {
+      initAudio(); const st = cardState[c.id], buf = c.make(st), now = ac.currentTime + 0.05;
+      hit(buf, now, c.gain);
+      if (c.id === 'riser') hit(mkKick({ f0: 210, f1: 36, dec: 0.8, click: 0.9 }), now + st.dur, 1);
+    };
+  });
+}
+function drawCard(c) {
+  const [ctx, w, h] = fit($('#cv-' + c.id)); ctx.clearRect(0, 0, w, h);
+  const st = cardState[c.id], arr = c.make(st), n = arr.length, cy = h / 2, amp = h * 0.42;
+  ctx.strokeStyle = C.line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(w, cy); ctx.stroke();
+  ctx.fillStyle = C.fg; ctx.globalAlpha = 0.85;
+  for (let x = 0; x < w; x++) { const a = Math.floor(x / w * n), b = Math.max(a + 1, Math.floor((x + 1) / w * n)); let mn = 0, mx = 0; for (let i = a; i < b; i++) { const v = arr[i]; if (v < mn) mn = v; if (v > mx) mx = v; } ctx.fillRect(x, cy - mx * amp, 1, Math.max(1, (mx - mn) * amp)); }
+  ctx.globalAlpha = 1; const dur = n / SR; mono(ctx, 11, 700); ctx.fillStyle = C.mute; ctx.textAlign = 'right'; ctx.fillText((dur * 1000).toFixed(0) + ' ms', w - 8, h - 8); ctx.textAlign = 'left';
+  ctx.strokeStyle = C.accent2; ctx.fillStyle = C.accent2; ctx.lineWidth = 2.5;
+  if (c.id === 'kick') {
+    ctx.beginPath(); for (let x = 0; x < w; x++) { const t = x / w * dur, f = st.f1 + (st.f0 - st.f1) * Math.exp(-t / 0.032), yy = h - 8 - (f - 20) / 260 * (h - 30); x ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.stroke();
+    ctx.fillText(`${st.f0} → ${st.f1} Hz`, 8, 16);
+  } else if (c.id === 'riser') {
+    ctx.beginPath(); for (let x = 0; x < w; x++) { const f = st.f0 * Math.pow(st.f1 / st.f0, x / w), yy = h - 8 - (Math.log2(f / 100) / Math.log2(13000 / 100)) * (h - 30); x ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.stroke();
+    ctx.fillStyle = C.accent; ctx.fillRect(w - 3, 0, 3, h); ctx.fillText(`${st.f0} → ${st.f1} Hz`, 8, 16); ctx.textAlign = 'right'; ctx.fillText(T('heroBeat'), w - 10, 16); ctx.textAlign = 'left';
+  } else if (c.id === 'pluck') {
+    ctx.setLineDash([5, 5]); ctx.beginPath(); for (let x = 0; x < w; x++) { const yy = cy - Math.exp(-(x / w * dur) / st.dec) * amp; x ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillText(`${noteName(st.note)} · ${midi(st.note).toFixed(1)} Hz`, 8, 16);
+  } else { ctx.fillText(`high-pass ${st.fc} Hz`, 8, 16); }
+}
+
+/* ───────── mixer plots */
+function drawDuck() {
+  const [ctx, w, h] = fit($('#pDuck')); ctx.clearRect(0, 0, w, h); const beat = 60 / state.bpm, span = 2 * beat, g = t => { let v = 1; for (const k of [0, beat]) if (t >= k) v = Math.min(v, 1 - state.duck * Math.exp(-(t - k) / 0.11)); return v; };
+  const top = 24, bot = h - 22, Y = v => bot - v * (bot - top);
+  ctx.fillStyle = C.accent; ctx.globalAlpha = 0.18; ctx.beginPath(); ctx.moveTo(0, bot); for (let x = 0; x <= w; x++) ctx.lineTo(x, Y(g(x / w * span))); ctx.lineTo(w, bot); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+  ctx.strokeStyle = C.accent; ctx.lineWidth = 2.5; ctx.beginPath(); for (let x = 0; x <= w; x++) { const yy = Y(g(x / w * span)); x ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); } ctx.stroke();
+  ctx.fillStyle = C.accent2; for (const k of [0, beat]) ctx.fillRect(k / span * w, 0, 3, 14);
+  mono(ctx, 11, 700); ctx.fillStyle = C.mute; ctx.fillText(T('duckAx'), 8, h - 6); ctx.textAlign = 'right'; ctx.fillText(T('kickWord'), w - 8, 12); ctx.textAlign = 'left';
+}
+function drawIR() {
+  const [ctx, w, h] = fit($('#pIR')); ctx.clearRect(0, 0, w, h); const cy = h / 2, sc = 0.25 + 0.75 * state.rev; let s = 99;
+  const r = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296 - 0.5; };
+  ctx.strokeStyle = C.fg; ctx.globalAlpha = 0.5; ctx.lineWidth = 1;
+  for (let x = 6; x < w; x += 2) { const a = Math.exp(-(x / w * 2.6) / 0.55) * (h * 0.42) * sc * (0.3 + Math.abs(r()) * 1.6); ctx.beginPath(); ctx.moveTo(x, cy - a); ctx.lineTo(x, cy + a); ctx.stroke(); }
+  ctx.globalAlpha = 1; ctx.strokeStyle = C.accent; ctx.lineWidth = 2.5; ctx.beginPath(); for (let x = 6; x < w; x++) { const a = Math.exp(-(x / w * 2.6) / 0.55) * (h * 0.42) * sc; x > 6 ? ctx.lineTo(x, cy - a) : ctx.moveTo(x, cy - a); } ctx.stroke();
+  mono(ctx, 11, 700); ctx.fillStyle = C.mute; ctx.fillText(T('irAx'), 8, h - 6); ctx.textAlign = 'right'; ctx.fillText(`${T('wetWord')} ${lang === 'tr' ? '%' + Math.round(state.rev * 100) : Math.round(state.rev * 100) + '%'}`, w - 8, 14); ctx.textAlign = 'left';
+}
+function drawDrive() {
+  const [ctx, w, h] = fit($('#pDrive')); ctx.clearRect(0, 0, w, h); const pad = 22, X = x => pad + (x + 1) / 2 * (w - 2 * pad), Y = y => h - pad - (y + 1) / 2 * (h - 2 * pad);
+  ctx.strokeStyle = C.line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(X(-1), Y(0)); ctx.lineTo(X(1), Y(0)); ctx.moveTo(X(0), Y(-1)); ctx.lineTo(X(0), Y(1)); ctx.stroke();
+  ctx.setLineDash([4, 5]); ctx.strokeStyle = C.mute; ctx.beginPath(); ctx.moveTo(X(-1), Y(-1)); ctx.lineTo(X(1), Y(1)); ctx.stroke(); ctx.setLineDash([]);
+  ctx.strokeStyle = C.accent; ctx.lineWidth = 2.5; ctx.beginPath(); for (let i = 0; i <= 120; i++) { const x = i / 60 - 1, y = Math.tanh(state.drive * x) / Math.tanh(state.drive); i ? ctx.lineTo(X(x), Y(y)) : ctx.moveTo(X(x), Y(y)); } ctx.stroke();
+  mono(ctx, 11, 700); ctx.fillStyle = C.mute; ctx.fillText(T('inOut'), 8, 14); ctx.textAlign = 'right'; ctx.fillText(`tanh(${state.drive.toFixed(1)}·x)`, w - 8, 14); ctx.textAlign = 'left';
+}
+const pct = v => (lang === 'tr' ? '%' + v : v + '%');
+function setMixLabels() { $('#duckO').textContent = pct(Math.round(state.duck * 100)); $('#revO').textContent = pct(Math.round(state.rev * 100)); $('#driveO').textContent = state.drive.toFixed(1); }
+$('#duck').oninput = e => { state.duck = e.target.value / 100; setMixLabels(); drawDuck(); };
+$('#rev').oninput = e => { state.rev = e.target.value / 100; setMixLabels(); if (wet) wet.gain.value = state.rev; drawIR(); };
+$('#drive').oninput = e => { state.drive = e.target.value / 10; setMixLabels(); setDrive(); drawDrive(); };
+
+/* ───────── motion: the reel's real hit list, scenes and three recipes */
+const HITS = [[0, .55, 'stamp'], [1, .7, 'stamp'], [2, .8, 'stamp'], [2.5, 1, 'stamp'], [4, .9, 'impact'], [6, .55, 'soft'], [8, .6, 'soft'], [10, .6, 'soft'], [12, 1, 'impact'], [14, .8, 'stamp'], [15, .9, 'stamp'], [16, 1, 'impact'], [20, .8, 'glitch'], [24, .8, 'stamp'], [25, .85, 'stamp'], [26, .9, 'stamp'], [28, 1, 'impact'], [29, .95, 'stamp']];
+const SCENE_SPAN = [[0, 4], [4, 6], [6, 8], [8, 10], [10, 12], [12, 16], [16, 20], [20, 28], [28, 32]];
+const camAt = tb => { let s = 0, dx = 0, dy = 0, r = 0; for (const [n, str] of HITS) { const d = (tb - n) * 60 / state.bpm; if (d < 0 || d > 0.7) continue; const k = Math.exp(-d * 9) * str; s += 0.03 * k; dx += Math.sin(d * 97 + n * 5.1) * 15 * k; dy += Math.cos(d * 83 + n * 3.7) * 12 * k; r += Math.sin(d * 61 + n) * 0.007 * k; } return { s: 1 + s, dx, dy, r }; };
+let scrubBeat = 12, labRun = false, labLast = 0;
+function labBeat() { return playing ? ((heroT() / (60 / state.bpm)) % 32 + 32) % 32 : scrubBeat; }
+function drawTimeline() {
+  const [ctx, w, h] = fit($('#tl')); ctx.clearRect(0, 0, w, h); const X = b => 8 + b / 32 * (w - 16), b = 60 / state.bpm, names = T('scenes');
+  SCENE_SPAN.forEach(([a, z], i) => { ctx.fillStyle = i % 2 ? C.panel2 : C.line; ctx.fillRect(X(a), 4, X(z) - X(a) - 2, 30); ctx.fillStyle = C.mute; mono(ctx, 10.5, 700); ctx.fillText(w < 520 && z - a < 3 ? '' : names[i], X(a) + 6, 23); });
+  const top = 66, bot = 126; ctx.fillStyle = C.mute; mono(ctx, 10.5, 700); ctx.fillText(T('camL'), 8, 52);
+  ctx.fillStyle = C.accent; ctx.globalAlpha = 0.9; ctx.beginPath(); ctx.moveTo(X(0), bot); for (let x = 0; x <= 400; x++) { const bb = x / 400 * 32, c = camAt(bb); ctx.lineTo(X(bb), bot - clamp((c.s - 1) / 0.07) * (bot - top)); } ctx.lineTo(X(32), bot); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+  ctx.fillStyle = C.mute; ctx.fillText(T('sndL'), 8, 146);
+  for (const bt of [...Array(24).keys()].map(i => i + 4)) { if (bt === 11 || bt === 27) continue; ctx.fillStyle = C.fg; ctx.globalAlpha = 0.35; ctx.fillRect(X(bt) - 1, 178, 2, 10); }
+  ctx.globalAlpha = 1; for (const [n, str, kind] of HITS) { ctx.fillStyle = kind === 'impact' ? C.accent : C.accent2; ctx.fillRect(X(n) - 1.5, 176 - str * 26, 3, str * 26 + 14); }
+  ctx.fillStyle = C.mute; mono(ctx, 10.5, 700); for (let bar = 0; bar <= 8; bar++) { const bx = X(bar * 4); ctx.fillRect(bx, 194, 1, 8); if (bar < 8 && w > 420) ctx.fillText(`${num(bar * 4 * b, 1)}${T('unitS')}`, bx + 4, 205); }
+  const px = X(labBeat()); ctx.fillStyle = C.fg; ctx.fillRect(px - 1, 0, 2, h - 10); ctx.beginPath(); ctx.moveTo(px - 6, 0); ctx.lineTo(px + 6, 0); ctx.lineTo(px, 8); ctx.fill();
+}
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function drawLab() {
+  const bb = labBeat(), t = bb * 60 / state.bpm, beatS = 60 / state.bpm;
+  { const [ctx, w, h] = fit($('#lab1')); ctx.clearRect(0, 0, w, h); const c = camAt(bb), s = Math.min(w, h) * 0.5;
+    ctx.save(); ctx.translate(w / 2 + c.dx * 0.6, h / 2 + c.dy * 0.6); ctx.rotate(c.r); ctx.scale(c.s, c.s); ctx.fillStyle = C.accent; rr(ctx, -s / 2, -s / 2, s, s, s * 0.2); ctx.fill();
+    ctx.fillStyle = C.bg; ctx.font = `800 ${s * 0.5}px 'Barlow Condensed', sans-serif`; ctx.textAlign = 'center'; ctx.fillText(lang === 'tr' ? 'NE' : 'HOW', 0, s * 0.17); ctx.restore(); ctx.textAlign = 'left';
+    mono(ctx, 11, 700); ctx.fillStyle = C.mute; ctx.fillText(`${T('scaleL')} ${num(c.s, 3)}  ·  ${T('shakeL')} ${num(Math.hypot(c.dx, c.dy), 1)} px`, 8, h - 8); }
+  { const [ctx, w, h] = fit($('#lab2')); ctx.clearRect(0, 0, w, h); const fl = Math.floor(bb), phase = 1.1 * t + 0.5 * (fl + outExpo(bb - fl)), F = Math.floor(phase), fr = phase - F, base = Math.min(w, h) * 0.05, gr = 1.27;
+    ctx.save(); ctx.translate(w / 2, h / 2);
+    for (let i = 16; i >= 0; i--) { const d = i - fr, size = base * Math.pow(gr, d), idx = i + F, odd = idx % 2 === 1; ctx.save(); ctx.rotate(idx * 0.115 + t * 0.12); ctx.globalAlpha = clamp(d / 2.5); rr(ctx, -size / 2, -size / 2, size, size, size * 0.2); ctx.fillStyle = C.panel2; ctx.fill(); ctx.strokeStyle = idx % 5 === 0 ? C.accent2 : odd ? C.accent : C.fg; ctx.lineWidth = (odd ? 2.5 : 1.2) + size * (odd ? 0.02 : 0.005); ctx.stroke(); ctx.restore(); }
+    ctx.restore(); mono(ctx, 11, 700); ctx.fillStyle = C.mute; ctx.fillText(`${T('phaseL')} ${num(phase, 2)}`, 8, h - 8); }
+  { const [ctx, w, h] = fit($('#lab3')); ctx.clearRect(0, 0, w, h); const N = 9, sp = Math.min(w, h) / 10.5, sc = sp / 70, cx = w / 2, cy = h / 2, L = [];
+    for (let k = Math.floor(bb) - 3; k <= Math.floor(bb) + 1; k++) { L.push([k * beatS, 1]); L.push([k * beatS + beatS / 2, 0.45]); }
+    for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { const x = (c - 4) * sp, y = (r - 4) * sp, d = Math.hypot(x, y); let G = 0; for (const [t0, a] of L) { const uu = t - t0; if (uu < 0 || uu > 1.2) continue; G += a * Math.exp(-Math.pow((d - uu * 1050 * sc) / (120 * sc), 2)) * (1 - uu / 1.2); } G = clamp(G * 1.7, 0, 1.4); const k = 1 + G * 0.07;
+      ctx.fillStyle = G > 0.05 ? C.accent : C.fg; ctx.globalAlpha = G > 0.05 ? 0.35 + 0.65 * clamp(G) : 0.3; ctx.beginPath(); ctx.arc(cx + x * k, cy + y * k, (4 + 17 * G) * Math.max(sc, 0.5), 0, 7); ctx.fill(); }
+    ctx.globalAlpha = 1; }
+}
+function syncScrub() { const v = labBeat(); $('#scrubO').textContent = num(v, 1) + ' ' + T('beatsU'); if (playing || labRun) $('#scrub').value = Math.round(v * 100); }
+function setLabLabel() { $('#labPlay').textContent = labRun ? T('pause') : T('silent'); }
+$('#scrub').oninput = e => { scrubBeat = e.target.value / 100; labRun = false; setLabLabel(); syncScrub(); };
+$('#labPlay').onclick = () => { if (playing) return; labRun = !labRun; labLast = performance.now(); setLabLabel(); };
+
+/* ───────── language switch */
+function applyLang() {
+  document.documentElement.lang = lang; document.title = T('title');
+  $$('[data-i]').forEach(el => (el.innerHTML = T(el.dataset.i)));
+  $('#l-en').setAttribute('aria-pressed', lang === 'en'); $('#l-tr').setAttribute('aria-pressed', lang === 'tr');
+  buildCards(); labelCells(); setPlayLabel(); setLabLabel(); setMixLabels(); setBpm(state.bpm); syncScrub(); redrawStatic();
+}
+function setLang(l) { lang = l; try { localStorage.setItem('ft-lang', l); } catch (e) { /* ignore */ } applyLang(); }
+$('#l-en').onclick = () => setLang('en'); $('#l-tr').onclick = () => setLang('tr');
+
+/* ───────── main loop + visibility */
+const vis = new Set(); const io = new IntersectionObserver(es => es.forEach(e => (e.isIntersecting ? vis.add(e.target.id) : vis.delete(e.target.id))), { rootMargin: '80px' });
+['canli', 'hareket'].forEach(id => io.observe($('#' + id)));
+function redrawStatic() { CARDS.forEach(drawCard); drawDuck(); drawIR(); drawDrive(); drawTimeline(); drawLab(); drawHero(heroT()); }
+function frame(now) {
+  if (labRun && !playing && !RM) { scrubBeat = (scrubBeat + (now - labLast) / 1000 / (60 / state.bpm)) % 32; labLast = now; }
+  if (vis.has('canli')) drawHero(heroT());
+  if (vis.has('hareket') && (playing || labRun)) { drawTimeline(); drawLab(); syncScrub(); }
+  requestAnimationFrame(frame);
+}
+addEventListener('resize', () => redrawStatic());
+applyLang(); requestAnimationFrame(frame);
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => redrawStatic());
+</script>
+</body>
+</html>

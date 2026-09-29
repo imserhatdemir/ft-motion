@@ -121,6 +121,8 @@ For character animation and real 3D sets. *cat-crossing: the whole scene*
 
 ## Sound (audio/ftsynth.py)
 
+For a hands-on walkthrough (play each instrument, move its parameters, hear the sidechain and reverb, scrub the reel's hit list) open [`sound-and-tempo.html`](sound-and-tempo.html).
+
 - `Mix.from_project(__file__)` reads duration, bpm and speed.
 - Drums: `m.drums(bar, kick=[…], snare=[…], hats=range(…), root=midi)` on a 16-step grid; kicks duck the pads and bass automatically.
 - Harmony: `m.pad(t, chord('Em9'), dur=m.bar)`, one chord per bar and the brightest on the lockup.

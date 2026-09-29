@@ -65,11 +65,15 @@ Seçenekler: `--lang xx` (sahneye `api.lang` olarak geçer), `--sub N` (alt kare
 
 **Vitrin reel'i:** [`examples/reel`](examples/reel), [`engine/fx.js`](engine/fx.js) ve [`engine/recipes.js`](engine/recipes.js) modüllerini çalıştıran 15 saniyelik, 128 BPM'lik bir reel: eğik / çubuk / daire geçişleri, glitch, kick'le vuran tünel, nokta küre, easing eğrisi anlatımı, dalgalanan nokta ızgarası, kinetik tipografi ve son olarak reel'in kendi kodunun yazılıp render edilmesi (önizlemenin içinde önizleme). Metinler `COPY` içinde (`--lang tr` / `--lang en`); ses ([`sound.py`](examples/reel/sound.py), [`audio/ftextras.py`](audio/ftextras.py)) her kamera vuruşunu yansıtır.
 
+**Sesin nasıl üretildiğini ve görüntünün tempoya nasıl kilitlendiğini** canlı demolarla [`docs/sound-and-tempo.html`](docs/sound-and-tempo.html) sayfası anlatır (varsayılan dil İngilizce, sağ üstten Türkçe'ye geçilir). Tarayıcıda aç: çalıp tempoyu değiştirebileceğin bir döngü, kaydırıcılı kick / hat / pluck / riser formülleri, üç mikser hamlesi (sidechain, yankı, tanh) ve reel'in gerçek vuruş listesi. Derleme gerektirmeyen tek bir statik dosya.
+
 ```bash
 node ft.mjs sheet examples/reel 16 --lang tr
 python examples/reel/sound.py
 node ft.mjs render examples/reel --lang tr
 ```
+
+**Düzenleme isteği, gerçek diff ve sonuç:** Sahne kod olduğu için bir revizyon okunabilir bir diff'tir. [`examples/edit-demo`](examples/edit-demo) tek bir gerçek turu gösterir: *"Reel'i 150 BPM'e çıkar ve vurgu rengini mercandan elektrik mavisine çevir. Ses senkronda kalsın."* isteği, bunu karşılayan [taslak PR](https://github.com/imserhatdemir/ft-motion/pull/5) ([`case/change.patch`](examples/edit-demo/case/change.patch)) ve önce/sonra videoları yan yana. `project.json`'daki tek bir sayı hem görüntüyü hem sesi yeniden zamanladı. Diff'in geri kalanı bunun kendiliğinden yetişmediği yerler: eski renge düşen yedi yardımcı, sabit yazılmış `128 BPM` etiketi, "900 kare" diyen metinler ve mutlak bir saniyeye bağlı tek bir ses olayı. Kendi düzenlemen için [README](examples/edit-demo/README.md)'ye bak.
 
 Teknik tarifler için [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md) dosyasına bak.
 

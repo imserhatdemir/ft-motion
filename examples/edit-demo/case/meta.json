@@ -1,0 +1,27 @@
+{
+  "prompt": "Speed the reel up to 150 BPM and change the accent colour from coral to electric blue. Keep the sound in sync.",
+  "repo": "ft-motion",
+  "project": "examples/reel",
+  "videoStart": 14.6,
+  "before": { "label": "BEFORE", "bpm": 128, "seconds": 15, "detail": "coral", "color": [255, 106, 61] },
+  "after": { "label": "AFTER", "bpm": 150, "seconds": 12.8, "detail": "electric blue", "color": [61, 123, 255] },
+  "steps": [
+    { "verb": "Read", "path": "examples/reel/project.json" },
+    { "verb": "Edit", "path": "examples/reel/project.json", "note": "bpm 128 → 150, 32 beats = 12.8 s" },
+    { "verb": "Edit", "path": "examples/reel/scene.js", "note": "CORAL → ACCENT, pass it to helpers" },
+    { "verb": "Edit", "path": "examples/reel/sound.py", "note": "bell at 14.4 s → beat 30.7" },
+    { "verb": "Run", "path": "node ft.mjs sheet examples/reel 16", "note": "fixed the “900 frames” copy" }
+  ],
+  "pick": [
+    { "file": "project.json", "key": "\"bpm\"", "whole": true, "title": "One number retimes picture and sound" },
+    { "file": "scene.js", "key": "CORAL = [255", "title": "The accent becomes one named constant" },
+    { "file": "scene.js", "key": "tunnel(ctx, W, H, surge(u, BEAT), u);", "title": "Helpers that defaulted to coral now get it" },
+    { "file": "scene.js", "key": "'128 BPM', W - 84", "title": "A hard-coded label now reads the tempo" },
+    { "file": "scene.js", "key": "small: 'FRAMES', count: 900", "title": "Found on review: the copy quoted 900 frames" },
+    { "file": "sound.py", "key": "m.add(14.4", "title": "The one absolute-seconds event moves to a beat" }
+  ],
+  "takeaway": [
+    "Tempo is one number. 18 camera hits, every wipe, riser and note followed it.",
+    "Two things were hard-coded: a bell at 14.4 s and the “900 frames” copy. Both turned up in review."
+  ]
+}

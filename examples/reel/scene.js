@@ -307,9 +307,9 @@ function end(ctx, W, H, t) {
     ctx.save(); ctx.translate(mx + wMI + 10 + wQ / 2, by2 - cap / 2); ctx.rotate(-0.3 * (1 - E.outExpo(qu)) + wig); ctx.scale(sq, sq); ctx.globalAlpha = clamp(qu * 6);
     T(ctx, '?', 0, cap / 2, { size: s2, w: 900, a: 'center', fill: CORAL }); ctx.restore();
   }
-  const ss = typed(TX.endSub, u, b(2), 44);
+  const ss = typed(TX.endSub, u, b(1.2), 50);
   if (ss.length) T(ctx, ss, x0, 950, { size: 26, f: MONO, w: 700, fill: BG });
-  const sg = typed(TX.sign, u, b(2) + 0.7, 16);
+  const sg = typed(TX.sign, u, b(2), 40);
   if (sg.length) T(ctx, sg, W - x0, 950, { size: 26, f: MONO, w: 700, a: 'right', fill: CORAL });
 }
 

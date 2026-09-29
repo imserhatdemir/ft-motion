@@ -111,10 +111,12 @@ audio/ftextras.py     stamp, counter ticks, echo, glitch burst
 templates/blank/      starting point for `new`
 examples/hello/       reference scene + soundtrack
 examples/reel/        15 s showcase reel: wipes, glitch, tunnel, dot sphere, easing graph, typed code (TR / EN)
+examples/edit-demo/   an edit request, its real git diff and the before / after renders side by side
 examples/cat-crossing/ 3D cartoon short (three.js): a cat crossing a busy street
 examples/chat-commerce/ conversational-commerce promo: chat demo, manifesto, inbox, dots → logo, glass end card
 examples/motion-principles/ kinetic manifesto: code → dot landscape → timing, rhythm, contrast, squash, morph
 docs/TECHNIQUES.md    recipes: timing, type, dot fields, morphs, UI, glass, impacts, sound
+docs/sound-and-tempo.html  interactive explainer: how the sound is synthesised, how motion locks to the beat (EN / TR)
 prompts/              brief-to-video prompt templates (EN / TR)
 ```
 
@@ -138,11 +140,21 @@ node ft.mjs render examples/chat-commerce --lang tr
 
 [`examples/reel`](examples/reel) is a 15 s, 128 BPM reel that puts [`engine/fx.js`](engine/fx.js) and [`engine/recipes.js`](engine/recipes.js) to work: nine scenes with skew / bars / disc wipes, a glitch tear, a tunnel that punches on the kick, a dot sphere, an easing-curve explainer, a rippling dot grid, kinetic type, and finally the reel's own source typing itself, rendering, and playing in a preview inside the preview. Copy is in `COPY` (`--lang tr` / `--lang en`), and the sound track ([`sound.py`](examples/reel/sound.py), using [`audio/ftextras.py`](audio/ftextras.py)) mirrors every camera hit.
 
+**How the sound is made and how the picture locks to the tempo** is explained with live demos in [`docs/sound-and-tempo.html`](docs/sound-and-tempo.html) (English, with a Turkish toggle). Open it in a browser: a loop you can play and re-tempo, the kick, hat, pluck and riser formulas with sliders, the three mixer moves (sidechain, reverb, tanh drive), and the reel's real hit list scrubbed against three motion recipes. It is a single static file that needs no build step.
+
 ```bash
 node ft.mjs sheet examples/reel 16 --lang en
 python examples/reel/sound.py
 node ft.mjs render examples/reel --lang en
 ```
+
+## An edit request, the real diff, and the result
+
+Because a scene is code, a revision is a diff you can read. [`examples/edit-demo`](examples/edit-demo) walks through one real round: the request *"Speed the reel up to 150 BPM and change the accent colour from coral to electric blue. Keep the sound in sync."*, the [draft PR](https://github.com/imserhatdemir/ft-motion/pull/5) that answered it (saved as [`case/change.patch`](examples/edit-demo/case/change.patch)), and the before and after renders side by side. One number in `project.json` retimed the picture and the sound. The rest of the diff is what that did not reach on its own: seven helpers that default to the old colour, a hard-coded `128 BPM` label, copy quoting `900 frames`, and one sound event at an absolute second.
+
+![Frames from the reel before and after the edit](docs/edit-demo-compare.jpg)
+
+The 30 s side-by-side video is itself an ft-motion project (the panel is drawn from `case/`, and `compose.mjs` overlays the two renders). See its [README](examples/edit-demo/README.md) to make one for your own edit.
 
 ## Tips
 

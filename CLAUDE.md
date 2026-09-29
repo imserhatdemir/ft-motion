@@ -30,6 +30,7 @@ Requirements: Node 18+, Python 3.10+ with numpy and scipy, ffmpeg on PATH, and C
 - After every meaningful change, render a sheet or stills and **look at them** before moving on. Check text clipping (descenders and diacritics), overlaps, legibility at phone size and logo fidelity.
 - Don't invent claims, metrics or testimonials. List every placeholder (names, prices) in your report.
 - Sound: every visual event gets a sound on the same timeline; aim for about -14 LUFS and ≤ -1 dBFS.
+- When retiming or restyling an existing example, look for what the change does not reach on its own: absolute seconds in `sound.py`, numbers quoted in copy (frame counts, durations, BPM labels), helper defaults such as `accent`. Render a sheet and read the end card. `examples/edit-demo` shows one such round with its real diff.
 - Never commit anything under `out/`, rendered media or `node_modules/`.
 
 ## Map
@@ -45,6 +46,8 @@ Requirements: Node 18+, Python 3.10+ with numpy and scipy, ffmpeg on PATH, and C
 - `audio/ftextras.py`: `stamp`, `counter_ticks`, `echo`, `glitch_burst`, `tick`, `tom`.
 - `examples/hello/`: reference scene using most techniques.
 - `examples/reel/`: 15 s, 128 BPM showcase of `fx.js` and `recipes.js` (wipes, glitch, tunnel, dot sphere, easing graph, typed code with a preview inside a preview), `sound.py` with `ftextras`; TR / EN.
+- `examples/edit-demo/`: 30 s, 4:5 side-by-side of an edit request, its real `git diff` (`case/change.patch`) and the BEFORE / AFTER renders of `examples/reel`. `scene.js` draws the panel from `case/`, `compose.mjs` overlays the two videos, `sound.py` scores the panel.
 - `examples/cat-crossing/`: three.js cartoon short (cel shading, ink lines, character rig, traffic, shot list).
 - `examples/chat-commerce/`, `examples/motion-principles/`: brandable 20 s promos (ported from ft-studio templates): copy in `COPY`, brand in `BRAND`, layout against `brandApi().fmt.safe`, 15 s choreography played at `speed` 0.75.
 - `docs/TECHNIQUES.md`: recipes, with pointers into the example.
+- `docs/sound-and-tempo.html`: standalone interactive explainer (EN default, TR toggle) of how `ftsynth` builds each sound and how scenes lock to the beat grid. Copy lives in the `I` dictionary; the DSP mirrors `audio/ftsynth.py`, so change both together.
