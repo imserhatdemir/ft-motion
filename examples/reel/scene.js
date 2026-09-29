@@ -1,4 +1,4 @@
-// examples/reel: a 15 s, 128 BPM showcase reel. Nine scenes, one file, zero keyframes.
+// examples/reel: a 12.8 s, 150 BPM showcase reel (32 beats). Nine scenes, one file, zero keyframes.
 //   hook → easing → morph → rhythm → type → tunnel → sphere → code → end card
 // It exists to show the effects in engine/fx.js and engine/recipes.js working together (wipes, glitch, bloom, aberration,
 // crisp HUD, dot sphere, tunnel, easing graph, typed code with a live preview inside a preview).
@@ -9,32 +9,33 @@ import { surge, tunnel, dotSphere, easingGraph, rippleDots } from '../../engine/
 
 const COPY = {
   tr: {
-    hook: ['NE', 'KADAR', 'İYİ'], hookSub: 'hareketli grafik tasarımcısı, 15 saniyede.',
+    hook: ['NE', 'KADAR', 'İYİ'], hookSub: () => `hareketli grafik tasarımcısı, ${secs()} saniyede.`,
     tags: { easing: 'EASING', morph: 'MORPH', rhythm: 'RİTİM', type: 'TİPOGRAFİ' },
     typeA: 'HARE', typeB: 'KET', typeSub: 'kinetik tipografi',
-    stamps: [{ big: '900', small: 'KARE', count: 900 }, { big: '60', small: 'FPS' }, { big: 'SIFIR', small: 'FARE' }],
+    stamps: [{ small: 'KARE', counts: true }, { big: '60', small: 'FPS' }, { big: 'SIFIR', small: 'FARE' }],
     marquee: 'SADECE KOD · ',
-    comment: '// hareket = zaman + matematik', rendering: n => `▸ ${n} / 900 kare çiziliyor`, previewTitle: 'önizleme · 60fps',
+    comment: '// hareket = zaman + matematik', rendering: n => `▸ ${n} / ${FRAMES} kare çiziliyor`, previewTitle: 'önizleme · 60fps',
     lines: ['BU VİDEO', 'KODLA', 'YAZILDI.'],
-    endTop: 'KANITLADIM', endBig: 'MI', endSub: '15 sn · 900 kare · sadece kod', sign: 'ft-motion ile yapıldı',
+    endTop: 'KANITLADIM', endBig: 'MI', endSub: () => `${secs()} sn · ${FRAMES} kare · sadece kod`, sign: 'ft-motion ile yapıldı',
   },
   en: {
-    hook: ['HOW', 'GOOD', 'AM I'], hookSub: 'motion graphics, in 15 seconds.',
+    hook: ['HOW', 'GOOD', 'AM I'], hookSub: () => `motion graphics, in ${secs()} seconds.`,
     tags: { easing: 'EASING', morph: 'MORPH', rhythm: 'RHYTHM', type: 'TYPOGRAPHY' },
     typeA: 'MOVE', typeB: 'MENT', typeSub: 'kinetic typography',
-    stamps: [{ big: '900', small: 'FRAMES', count: 900 }, { big: '60', small: 'FPS' }, { big: 'ZERO', small: 'MOUSE' }],
+    stamps: [{ small: 'FRAMES', counts: true }, { big: '60', small: 'FPS' }, { big: 'ZERO', small: 'MOUSE' }],
     marquee: 'CODE ONLY · ',
-    comment: '// motion = time + math', rendering: n => `▸ rendering ${n} / 900 frames`, previewTitle: 'preview · 60fps',
+    comment: '// motion = time + math', rendering: n => `▸ rendering ${n} / ${FRAMES} frames`, previewTitle: 'preview · 60fps',
     lines: ['THIS VIDEO', 'WAS WRITTEN', 'IN CODE.'],
-    endTop: 'PROVED', endBig: 'IT', endSub: '15 s · 900 frames · code only', sign: 'made with ft-motion',
+    endTop: 'PROVED', endBig: 'IT', endSub: () => `${secs()} s · ${FRAMES} frames · code only`, sign: 'made with ft-motion',
   },
 };
 
-const BG = [10, 10, 13], INK = [242, 237, 228], CORAL = [255, 106, 61], AMBER = [255, 181, 71], PANEL = [19, 19, 24];
+const BG = [10, 10, 13], INK = [242, 237, 228], ACCENT = [61, 123, 255], AMBER = [255, 181, 71], PANEL = [19, 19, 24];
 const DISP = "'Barlow Condensed'", MONO = "'JetBrains Mono'";
 
 // ───────────── timeline (in beats; filled in setup from api.beat)
-let BEAT = 0.46875, TX = COPY.tr, LAY = null;
+let BEAT = 0.46875, TX = COPY.tr, LAY = null, FRAMES = 900, DURATION = 15;
+const secs = () => DURATION.toFixed(1).replace(/\.0$/, '');     // "15" or "12.8", so copy never quotes a stale length
 const b = n => n * BEAT;
 const SCENES = [['hook', 0, 4], ['easing', 4, 6], ['morph', 6, 8], ['rhythm', 8, 10], ['type', 10, 12], ['tunnel', 12, 16], ['sphere', 16, 20], ['code', 20, 28], ['end', 28, 32]];
 const at = name => b(SCENES.find(s => s[0] === name)[1]);
@@ -79,7 +80,7 @@ const gridDark = (ctx, W, H, t) => grid(ctx, W, H, t, BG, 'rgba(242,237,228,0.04
 /** number pill + label, top left of the mini scenes */
 function tag(ctx, u, num, label, theme = 'dark') {
   const p = E.outExpo(prog(u, 0, 0.22)); if (p <= 0) return;
-  const x = 84, y = 128, pill = theme === 'coral' ? BG : CORAL;
+  const x = 84, y = 128, pill = theme === 'coral' ? BG : ACCENT;
   ctx.save(); ctx.globalAlpha = p; ctx.translate(-36 * (1 - p), 0);
   ctx.fillStyle = rgba(pill); rrect(ctx, x, y - 30, 64, 44, 10); ctx.fill();
   T(ctx, num, x + 32, y, { size: 22, f: MONO, w: 700, a: 'center', fill: theme === 'coral' ? INK : BG });
@@ -107,12 +108,12 @@ function hook(ctx, W, H, t) {
   if (q > 0) {
     const sq = 1 + 1.5 * (1 - E.outBack(q, 2.2)), wQ = LAY.hook.wQ;
     ctx.save(); ctx.translate(xq + wQ / 2, byQ - cap / 2); ctx.rotate(-0.3 * (1 - E.outExpo(q))); ctx.scale(sq, sq); ctx.globalAlpha = clamp(q * 5);
-    T(ctx, '?', 0, cap / 2, { size, w: 900, a: 'center', fill: CORAL }); ctx.restore();
+    T(ctx, '?', 0, cap / 2, { size, w: 900, a: 'center', fill: ACCENT }); ctx.restore();
   }
-  const ss = typed(TX.hookSub, t, b(3), 46);
+  const sub = TX.hookSub(), ss = typed(sub, t, b(3), 46);
   if (ss.length) {
     T(ctx, ss, x0, 994, { size: 26, f: MONO, w: 500, fill: INK, alpha: 0.85 });
-    if (blink(t) || ss.length < TX.hookSub.length) { ctx.fillStyle = rgba(CORAL); ctx.fillRect(x0 + tw(ctx, ss, 26, MONO, 500) + 4, 974, 14, 26); }
+    if (blink(t) || ss.length < sub.length) { ctx.fillStyle = rgba(ACCENT); ctx.fillRect(x0 + tw(ctx, ss, 26, MONO, 500) + 4, 974, 14, 26); }
   }
 }
 
@@ -129,10 +130,10 @@ function easing(ctx, W, H, t) {
   const ey = easingGraph(ctx, 270, 770, 540, {
     cp: [lerp(0.33, 0.16, k), lerp(0.33, 1, k), lerp(0.66, 0.3, k), lerp(0.66, 1, k)],
     handles: E.outExpo(prog(u, 0.02, 0.32)), drawn: E.outCubic(prog(u, 0.04, 0.46)), ball: u > 0.18 ? tb : null, pop: prog(u, 0.82, 1.22),
-  }, { bg: BG, alpha: 1 });
+  }, { bg: BG, accent: ACCENT, alpha: 1 });
   T(ctx, 'TIME', 810, 804, { size: 15, f: MONO, w: 700, a: 'right', fill: [106, 106, 115], ls: 3 });
   ctx.save(); ctx.translate(244, 230); ctx.rotate(-Math.PI / 2); T(ctx, 'VALUE', 0, 0, { size: 15, f: MONO, w: 700, a: 'right', fill: [106, 106, 115], ls: 3 }); ctx.restore();
-  if (ey !== null) T(ctx, 'y = ' + ey.toFixed(2), 802, 744, { size: 46, f: MONO, w: 700, a: 'right', fill: CORAL });
+  if (ey !== null) T(ctx, 'y = ' + ey.toFixed(2), 802, 744, { size: 46, f: MONO, w: 700, a: 'right', fill: ACCENT });
   T(ctx, typed('cubic-bezier(.16, 1, .3, 1)', u, 0.12, 60), 270, 850, { size: 27, f: MONO, w: 500, fill: INK });
   ctx.restore();
 }
@@ -152,25 +153,25 @@ function morph(ctx, W, H, t, u, mini = false) {
   const pathAt = (uu, s) => { const { a, m } = morphState(uu); morphPath(ctx, 0, 0, R * s, SEQ[a], SEQ[a + 1], m, rotOf(uu)); };
   for (let k = 6; k >= 1; k--) { const uk = Math.max(0, u - k * 0.03); pathAt(uk, pin * (1 + 0.045 * k)); ctx.strokeStyle = `rgba(242,237,228,${0.5 * (1 - k / 7)})`; ctx.lineWidth = 3; ctx.stroke(); }
   pathAt(u, pin);
-  const g = ctx.createLinearGradient(-R, -R, R, R); g.addColorStop(0, rgba(CORAL)); g.addColorStop(1, '#FF9C4A');
+  const g = ctx.createLinearGradient(-R, -R, R, R); g.addColorStop(0, rgba(ACCENT)); g.addColorStop(1, rgba(mix(ACCENT, INK, 0.4)));
   ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = rgba(INK); ctx.lineWidth = 5; ctx.stroke();
   ctx.fillStyle = rgba(BG); ctx.beginPath(); ctx.arc(0, 0, 16, 0, TAU); ctx.fill();
   ctx.restore();
 }
 
 // ───────────── 4 · rhythm (cream): dot grid, ripples launched on the beat
-function rhythm(ctx, W, H, t) {
+function rhythm(ctx, W, H, t, api) {
   const u = t - at('rhythm'), t0 = at('rhythm');
   grid(ctx, W, H, t, INK, 'rgba(10,10,13,0.05)', 'rgba(10,10,13,0.16)'); tag(ctx, u, '03', TX.tags.rhythm, 'light');
-  rippleDots(ctx, 540, 560, t, [[t0, 1], [t0 + BEAT / 2, 0.45], [t0 + BEAT, 1], [t0 + BEAT * 1.5, 0.45]], { from: BG, to: CORAL });
-  ctx.fillStyle = rgba(CORAL); ctx.beginPath(); ctx.arc(540, 560, 16 + 22 * beatPulse(t, t0), 0, TAU); ctx.fill();
-  T(ctx, '128 BPM', W - 84, 128, { size: 22, f: MONO, w: 700, a: 'right', fill: BG, ls: 4 });
+  rippleDots(ctx, 540, 560, t, [[t0, 1], [t0 + BEAT / 2, 0.45], [t0 + BEAT, 1], [t0 + BEAT * 1.5, 0.45]], { from: BG, to: ACCENT });
+  ctx.fillStyle = rgba(ACCENT); ctx.beginPath(); ctx.arc(540, 560, 16 + 22 * beatPulse(t, t0), 0, TAU); ctx.fill();
+  T(ctx, `${api.bpm} BPM`, W - 84, 128, { size: 22, f: MONO, w: 700, a: 'right', fill: BG, ls: 4 });
 }
 
 // ───────────── 5 · type (coral): letters flip up out of masks, ghost outlines drift behind
 function typo(ctx, W, H, t) {
   const u = t - at('type');
-  grid(ctx, W, H, t, CORAL, 'rgba(10,10,13,0.09)', 'rgba(10,10,13,0.25)'); tag(ctx, u, '04', TX.tags.type, 'coral');
+  grid(ctx, W, H, t, ACCENT, 'rgba(10,10,13,0.09)', 'rgba(10,10,13,0.25)'); tag(ctx, u, '04', TX.tags.type, 'coral');
   const { size, ls, x0, wFull } = LAY.type;
   [{ s: TX.typeA, by: 545, t0: 0.08, col: BG }, { s: TX.typeB, by: 885, t0: 0.26, col: INK }].forEach(l => {
     const gp = E.outExpo(prog(u, l.t0 + 0.4, l.t0 + 0.8));
@@ -196,18 +197,18 @@ function stamp(ctx, W, H, big, small, p, maxW, maxPx = 470) {
   const top = 540 - (cap + gap + sCap) / 2, bb = top + cap, sb = bb + gap + sCap, sc = lerp(1.7, 1, E.outExpo(p));
   ctx.save(); ctx.translate(540, 540); ctx.scale(sc, sc); ctx.translate(-540, -540); ctx.globalAlpha = clamp(p * 4);
   T(ctx, big, 540, bb, { size, w: 900, a: 'center', fill: INK, stroke: BG, lw: 30 });
-  T(ctx, small, 540, sb, { size: sSize, w: 900, a: 'center', fill: CORAL, stroke: BG, lw: 24, ls: 22 });
+  T(ctx, small, 540, sb, { size: sSize, w: 900, a: 'center', fill: ACCENT, stroke: BG, lw: 24, ls: 22 });
   ctx.restore();
 }
 function tunnelScene(ctx, W, H, t, api, tFrame) {
   const u = t - at('tunnel');
   ctx.fillStyle = rgba(BG); ctx.fillRect(0, 0, W, H);
-  const g = ctx.createRadialGradient(540, 540, 0, 540, 540, 560); g.addColorStop(0, 'rgba(255,107,61,0.55)'); g.addColorStop(1, 'rgba(255,107,61,0)');
+  const g = ctx.createRadialGradient(540, 540, 0, 540, 540, 560); g.addColorStop(0, rgba(ACCENT, 0.55)); g.addColorStop(1, rgba(ACCENT, 0));
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  tunnel(ctx, W, H, surge(u, BEAT), u);
+  tunnel(ctx, W, H, surge(u, BEAT), u, { colors: { a: ACCENT } });
   const seg = u < b(2) ? 0 : u < b(3) ? 1 : 2, S = TX.stamps[seg], u0 = [0, b(2), b(3)][seg];
   // the counter uses the un-blurred frame time so its digits stay sharp under motion blur
-  const big = seg === 0 ? String(Math.round(S.count * E.outExpo(prog(tFrame - at('tunnel'), 0, 0.85)))) : S.big;
+  const big = S.counts ? String(Math.round(FRAMES * E.outExpo(prog(tFrame - at('tunnel'), 0, 0.85)))) : S.big;
   stamp(ctx, W, H, big, S.small, prog(u, u0, u0 + 0.24), seg === 2 ? 800 : 780, seg === 2 ? 380 : 470);
 }
 
@@ -222,9 +223,9 @@ function sphere(ctx, W, H, t) {
   for (let k = -1; k < 3; k++) T(ctx, unit, -uw + o2 + k * uw, 850, { size, w: 900, fill: INK, alpha: 0.06 + 0.06 * pulse });
   ctx.restore();
   ctx.save(); ctx.translate(0, 15);
-  dotSphere(ctx, 540, 540, 315, { yaw: u * 1.05 + 0.4 + 0.25 * E.outExpo(clamp(u / BEAT)), tilt: 0.42, band: Math.sin(u * 3.3) * 0.85, pulse, satellite: u * 2.6 });
+  dotSphere(ctx, 540, 540, 315, { yaw: u * 1.05 + 0.4 + 0.25 * E.outExpo(clamp(u / BEAT)), tilt: 0.42, band: Math.sin(u * 3.3) * 0.85, pulse, satellite: u * 2.6, colors: { accent: ACCENT } });
   ctx.restore();
-  shockRing(ctx, 540, 555, t, at('sphere'), { life: 0.7, width: 70, radius: 1500, color: CORAL });
+  shockRing(ctx, 540, 555, t, at('sphere'), { life: 0.7, width: 70, radius: 1500, color: ACCENT });
 }
 
 // ───────────── 8 · code: a real ft-motion scene types itself, renders, and previews inside itself
@@ -242,35 +243,35 @@ function code(ctx, W, H, t, api, tFrame) {
   gridDark(ctx, W, H, t);
   const ep = E.outExpo(prog(u, 0, 0.35)), ex = 64, ey = 160, ew = 760, eh = 440;
   ctx.save(); ctx.globalAlpha = ep; ctx.translate(0, 50 * (1 - ep));
-  windowFrame(ctx, ex, ey, ew, eh, 'scene.js');
+  windowFrame(ctx, ex, ey, ew, eh, 'scene.js', { accent: ACCENT });
   CODE[0][0][0] = TX.comment;
-  typeCode(ctx, ex, ey + 100, CODE, Math.max(0, u - 0.12) * 150);
+  typeCode(ctx, ex, ey + 100, CODE, Math.max(0, u - 0.12) * 150, { caret: ACCENT, colors: { kw: rgba(ACCENT) } });
   ctx.restore();
   const tp = E.outExpo(prog(u, b(1.5), b(1.5) + 0.35));
   if (tp > 0) {
     const tx = 64, ty = 650, tW = 520, tH = 250;
     ctx.save(); ctx.globalAlpha = tp; ctx.translate(0, 40 * (1 - tp));
-    windowFrame(ctx, tx, ty, tW, tH, 'terminal');
+    windowFrame(ctx, tx, ty, tW, tH, 'terminal', { accent: ACCENT });
     T(ctx, '$ node ft.mjs render examples/reel', tx + 28, ty + 92, { size: 21, f: MONO, w: 700 });
-    const pr = E.inOutCubic(prog(tFrame - at('code'), b(2.2), b(2.2) + 1.3)), fr = String(Math.round(900 * pr)).padStart(3, '0');
+    const pr = E.inOutCubic(prog(tFrame - at('code'), b(2.2), b(2.2) + 1.3)), fr = String(Math.round(FRAMES * pr)).padStart(3, '0');
     T(ctx, TX.rendering(fr), tx + 28, ty + 134, { size: 22, f: MONO, w: 500, fill: [154, 154, 163] });
     ctx.fillStyle = 'rgba(242,237,228,0.14)'; rrect(ctx, tx + 28, ty + 158, tW - 56, 14, 7); ctx.fill();
-    ctx.fillStyle = rgba(CORAL); if (pr > 0) { rrect(ctx, tx + 28, ty + 158, Math.max(14, (tW - 56) * pr), 14, 7); ctx.fill(); }
-    if (pr >= 1) T(ctx, '✓ reel.mp4 · 15.0 s', tx + 28, ty + 214, { size: 24, f: MONO, w: 700, fill: AMBER });
+    ctx.fillStyle = rgba(ACCENT); if (pr > 0) { rrect(ctx, tx + 28, ty + 158, Math.max(14, (tW - 56) * pr), 14, 7); ctx.fill(); }
+    if (pr >= 1) T(ctx, `✓ reel.mp4 · ${DURATION.toFixed(1)} s`, tx + 28, ty + 214, { size: 24, f: MONO, w: 700, fill: AMBER });
     ctx.restore();
   }
   const pp = E.outBack(prog(u, b(2), b(2) + 0.4), 1.9);
   if (pp > 0) {
     const px = 620, py = 470, pw = 400, ph = 444;
     ctx.save(); ctx.translate(px + pw / 2, py + ph / 2); ctx.scale(pp, pp); ctx.translate(-(px + pw / 2), -(py + ph / 2));
-    windowFrame(ctx, px, py, pw, ph, TX.previewTitle, { r: 20 });
+    windowFrame(ctx, px, py, pw, ph, TX.previewTitle, { r: 20, accent: ACCENT });
     ctx.save(); ctx.beginPath(); ctx.rect(px, py + 46, pw, ph - 46); ctx.clip();
     ctx.translate(px + pw / 2, py + 46 + (ph - 46) / 2); const ps = pw / 1080 * 1.04; ctx.scale(ps, ps); ctx.translate(-540, -560);
     const dur = b(2), ul = (u - b(2)) % dur;
     morph(ctx, W, H, at('morph') + ul, ul, true);
     ctx.restore();
     ctx.fillStyle = 'rgba(242,237,228,0.15)'; ctx.fillRect(px + 24, py + ph - 20, pw - 48, 4);
-    ctx.fillStyle = rgba(CORAL); ctx.fillRect(px + 24, py + ph - 20, (pw - 48) * (((u - b(2)) % dur) / dur), 4);
+    ctx.fillStyle = rgba(ACCENT); ctx.fillRect(px + 24, py + ph - 20, (pw - 48) * (((u - b(2)) % dur) / dur), 4);
     ctx.restore();
   }
   // dim the windows and stamp the three lines (same masked rise as the hook: a bookend)
@@ -281,7 +282,7 @@ function code(ctx, W, H, t, api, tFrame) {
     const t0 = b(4 + i), by = 540 - (2 * (cap + 0.32 * size) + cap) / 2 + cap + i * (cap + 0.32 * size), p = E.outExpo(prog(u, t0, t0 + 0.36));
     if (p <= 0) return;
     ctx.fillStyle = 'rgba(242,237,228,0.22)'; ctx.fillRect(x0, by + 30, (W - 2 * x0) * E.outExpo(prog(u, t0 + 0.03, t0 + 0.58)), 3);
-    riseText(ctx, W, s, x0, by, size, p, { w: 900, fill: i === 2 ? CORAL : INK });
+    riseText(ctx, W, s, x0, by, size, p, { w: 900, fill: i === 2 ? ACCENT : INK });
   });
 }
 
@@ -305,26 +306,26 @@ function end(ctx, W, H, t) {
     const qu = prog(u, BEAT + 0.1, BEAT + 0.7), sq = 1 + 1.6 * (1 - E.outBack(qu, 2.4)), w0 = BEAT + 0.7;
     const wig = u > w0 ? 0.09 * Math.sin((u - w0) * 11) * Math.exp(-(u - w0) * 2.2) : 0;
     ctx.save(); ctx.translate(mx + wMI + 10 + wQ / 2, by2 - cap / 2); ctx.rotate(-0.3 * (1 - E.outExpo(qu)) + wig); ctx.scale(sq, sq); ctx.globalAlpha = clamp(qu * 6);
-    T(ctx, '?', 0, cap / 2, { size: s2, w: 900, a: 'center', fill: CORAL }); ctx.restore();
+    T(ctx, '?', 0, cap / 2, { size: s2, w: 900, a: 'center', fill: ACCENT }); ctx.restore();
   }
-  const ss = typed(TX.endSub, u, b(1.2), 50);
+  const ss = typed(TX.endSub(), u, b(1.2), 50);
   if (ss.length) T(ctx, ss, x0, 950, { size: 26, f: MONO, w: 700, fill: BG });
   const sg = typed(TX.sign, u, b(2), 40);
-  if (sg.length) T(ctx, sg, W - x0, 950, { size: 26, f: MONO, w: 700, a: 'right', fill: CORAL });
+  if (sg.length) T(ctx, sg, W - x0, 950, { size: 26, f: MONO, w: 700, a: 'right', fill: ACCENT });
 }
 
 // ───────────── transitions, in one place so the order is obvious
 function transitions(ctx, W, H, t, hookDot) {
-  transition(ctx, W, H, t, { mid: b(4), color: CORAL, cover: { kind: 'disc', dur: 0.36, at: hookDot }, reveal: { kind: 'skew', axis: 'y', dir: -1, dur: 0.46 } });
-  transition(ctx, W, H, t, { mid: b(6), color: INK, stripe: CORAL, cover: { dur: 0.3, dir: 1 }, reveal: { dur: 0.36, dir: 1 } });
-  transition(ctx, W, H, t, { mid: b(8), color: CORAL, cover: { kind: 'bars', dur: 0.32 }, reveal: { kind: 'bars', dur: 0.42 } });
-  transition(ctx, W, H, t, { mid: b(10), color: BG, stripe: CORAL, cover: { dur: 0.3, dir: -1 }, reveal: { dur: 0.36, dir: -1 } });
-  transition(ctx, W, H, t, { mid: b(28), color: CORAL, cover: { kind: 'disc', dur: 0.27, at: [540, 560] }, reveal: { kind: 'skew', axis: 'y', dir: -1, dur: 0.5 } });
+  transition(ctx, W, H, t, { mid: b(4), color: ACCENT, cover: { kind: 'disc', dur: 0.36, at: hookDot }, reveal: { kind: 'skew', axis: 'y', dir: -1, dur: 0.46 } });
+  transition(ctx, W, H, t, { mid: b(6), color: INK, stripe: ACCENT, cover: { dur: 0.3, dir: 1 }, reveal: { dur: 0.36, dir: 1 } });
+  transition(ctx, W, H, t, { mid: b(8), color: ACCENT, cover: { kind: 'bars', dur: 0.32 }, reveal: { kind: 'bars', dur: 0.42 } });
+  transition(ctx, W, H, t, { mid: b(10), color: BG, stripe: ACCENT, cover: { dur: 0.3, dir: -1 }, reveal: { dur: 0.36, dir: -1 } });
+  transition(ctx, W, H, t, { mid: b(28), color: ACCENT, cover: { kind: 'disc', dur: 0.27, at: [540, 560] }, reveal: { kind: 'skew', axis: 'y', dir: -1, dur: 0.5 } });
 }
 
 export default {
   async setup(api) {
-    BEAT = api.beat; TX = COPY[api.lang] || COPY.en;
+    BEAT = api.beat; TX = COPY[api.lang] || COPY.en; DURATION = api.duration; FRAMES = Math.round(api.duration * api.fps);
     const c = document.createElement('canvas').getContext('2d'), W = api.W;
     // hook: one size that fits the widest line (and the last word + "?"), then baselines with room for the İ dots
     const hs = Math.min(300, ...[...TX.hook.slice(0, 2), TX.hook[2] + '?'].map(s => fitFont(c, s, W - 168 - 80, 300, 900, DISP, 0)));
@@ -354,7 +355,7 @@ export default {
     if (name === 'hook') hook(ctx, W, H, t);
     else if (name === 'easing') easing(ctx, W, H, t);
     else if (name === 'morph') morph(ctx, W, H, t, t - at('morph'));
-    else if (name === 'rhythm') rhythm(ctx, W, H, t);
+    else if (name === 'rhythm') rhythm(ctx, W, H, t, api);
     else if (name === 'type') typo(ctx, W, H, t);
     else if (name === 'tunnel') tunnelScene(ctx, W, H, t, api, tFrame);
     else if (name === 'sphere') sphere(ctx, W, H, t);
@@ -362,9 +363,9 @@ export default {
     else end(ctx, W, H, t);
     ctx.restore();
     transitions(ctx, W, H, t, LAY.hook.dot);
-    flash(ctx, W, H, t, b(12), 0.85, 0.07); flash(ctx, W, H, t, b(16), 0.6, 0.06, CORAL);
+    flash(ctx, W, H, t, b(12), 0.85, 0.07); flash(ctx, W, H, t, b(16), 0.6, 0.06, ACCENT);
     shockRing(ctx, 540, 540, t, b(12), { color: INK });
-    glitch(ctx, W, H, t, b(20));
+    glitch(ctx, W, H, t, b(20), { colors: [ACCENT, INK] });
     const fo = prog(t, api.duration - 0.2, api.duration);                      // fade to the start colour so the loop is seamless
     if (fo > 0) { ctx.save(); ctx.globalAlpha = fo; ctx.fillStyle = rgba(BG); ctx.fillRect(0, 0, W, H); ctx.restore(); }
   },
@@ -372,7 +373,7 @@ export default {
   // post runs once per output frame on the blended image: crisp HUD, glow, aberration on the big hits, vignette
   post(ctx, t, api) {
     const { W, H } = api, name = sceneAt(t), light = name === 'rhythm' || name === 'type' || name === 'end';
-    hud(ctx, api, t, { theme: light ? 'light' : 'dark', brand: 'FT-MOTION · REEL', scene: 'SCENE 0' + (SCENES.findIndex(s => s[0] === name) + 1) + ' ' + name.toUpperCase(), spec: '1080×1080 · 60 FPS · 128 BPM' });
+    hud(ctx, api, t, { theme: light ? 'light' : 'dark', brand: 'FT-MOTION · REEL', scene: 'SCENE 0' + (SCENES.findIndex(s => s[0] === name) + 1) + ' ' + name.toUpperCase(), spec: `1080×1080 · 60 FPS · ${api.bpm} BPM`, accent: ACCENT });
     bloom(ctx, W, H);
     aberrate(ctx, W, H, aberrationAt(t, HITS.filter(([n, s]) => BIG.includes(n) || s >= 0.95).map(([n, s]) => [b(n), s])));
     vignette(ctx, W, H, 0.45);
