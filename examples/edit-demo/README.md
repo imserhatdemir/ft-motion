@@ -10,7 +10,7 @@ Motion graphics as code means a revision is a diff you can read. This example sh
 
 ## What changed
 
-The real commit is [`demo/edit-150bpm-blue`](https://github.com/imserhatdemir/ft-motion/compare/add-reel-techniques...demo/edit-150bpm-blue) (3 files, +56 −55), saved here as [`case/change.patch`](case/change.patch). The highlights:
+The real change is the (draft, never-to-be-merged) PR [`demo/edit-150bpm-blue`](https://github.com/imserhatdemir/ft-motion/pull/5) (3 files, +56 −55), saved here as [`case/change.patch`](case/change.patch). The highlights:
 
 ```diff
 --- examples/reel/project.json

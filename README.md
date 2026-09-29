@@ -150,7 +150,7 @@ node ft.mjs render examples/reel --lang en
 
 ## An edit request, the real diff, and the result
 
-Because a scene is code, a revision is a diff you can read. [`examples/edit-demo`](examples/edit-demo) walks through one real round: the request *"Speed the reel up to 150 BPM and change the accent colour from coral to electric blue. Keep the sound in sync."*, the [commit](https://github.com/imserhatdemir/ft-motion/compare/add-reel-techniques...demo/edit-150bpm-blue) that answered it (saved as [`case/change.patch`](examples/edit-demo/case/change.patch)), and the before and after renders side by side. One number in `project.json` retimed the picture and the sound. The rest of the diff is what that did not reach on its own: seven helpers that default to the old colour, a hard-coded `128 BPM` label, copy quoting `900 frames`, and one sound event at an absolute second.
+Because a scene is code, a revision is a diff you can read. [`examples/edit-demo`](examples/edit-demo) walks through one real round: the request *"Speed the reel up to 150 BPM and change the accent colour from coral to electric blue. Keep the sound in sync."*, the [commit](https://github.com/imserhatdemir/ft-motion/pull/5) that answered it (saved as [`case/change.patch`](examples/edit-demo/case/change.patch)), and the before and after renders side by side. One number in `project.json` retimed the picture and the sound. The rest of the diff is what that did not reach on its own: seven helpers that default to the old colour, a hard-coded `128 BPM` label, copy quoting `900 frames`, and one sound event at an absolute second.
 
 ![Frames from the reel before and after the edit](docs/edit-demo-compare.jpg)
 
