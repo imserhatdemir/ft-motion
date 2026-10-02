@@ -1,0 +1,23 @@
+{
+  "name": "space-launch",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "duration": 60,
+  "bpm": 120,
+  "speed": 1,
+  "lang": "en",
+  "subframes": 6,
+  "shutter": 0.5,
+  "fonts": {
+    "css": [
+      "@fontsource/barlow-condensed/600.css",
+      "@fontsource/barlow-condensed/700.css",
+      "@fontsource/barlow-condensed/800.css",
+      "@fontsource/jetbrains-mono/500.css",
+      "@fontsource/jetbrains-mono/700.css"
+    ],
+    "preload": ["600 40px 'Barlow Condensed'", "700 40px 'Barlow Condensed'", "800 40px 'Barlow Condensed'", "500 40px 'JetBrains Mono'", "700 40px 'JetBrains Mono'"],
+    "sample": "AaBbÇçĞğİıÖöŞşÜüÄäÉéÑñß0123456789·—›→…“”’"
+  }
+}

@@ -48,6 +48,7 @@ Requirements: Node 18+, Python 3.10+ with numpy and scipy, ffmpeg on PATH, and C
 - `examples/reel/`: 15 s, 128 BPM showcase of `fx.js` and `recipes.js` (wipes, glitch, tunnel, dot sphere, easing graph, typed code with a preview inside a preview), `sound.py` with `ftextras`; TR / EN.
 - `examples/edit-demo/`: 30 s, 4:5 side-by-side of an edit request, its real `git diff` (`case/change.patch`) and the BEFORE / AFTER renders of `examples/reel`. `scene.js` draws the panel from `case/`, `compose.mjs` overlays the two videos, `sound.py` scores the panel.
 - `examples/cat-crossing/`: three.js cartoon short (cel shading, ink lines, character rig, traffic, shot list).
+- `examples/space-launch/`: 60 s, 16:9, 120 BPM story promo for ft-motion in the shape of a narrated launch film (space hook → saucer → HQ → demo window with brief, storyboard, code, sheet QA, sound, render, EN/TR → feature cards → end card). Captions are timed in `CAP_AT` and double as a VO script; an optional `vo.wav` is mixed by `sound.py`.
 - `examples/chat-commerce/`, `examples/motion-principles/`: brandable 20 s promos (ported from ft-studio templates): copy in `COPY`, brand in `BRAND`, layout against `brandApi().fmt.safe`, 15 s choreography played at `speed` 0.75.
 - `docs/TECHNIQUES.md`: recipes, with pointers into the example.
 - `docs/sound-and-tempo.html`: standalone interactive explainer (EN default, TR toggle) of how `ftsynth` builds each sound and how scenes lock to the beat grid. Copy lives in the `I` dictionary; the DSP mirrors `audio/ftsynth.py`, so change both together.
