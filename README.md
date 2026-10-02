@@ -117,6 +117,7 @@ examples/chat-commerce/ conversational-commerce promo: chat demo, manifesto, inb
 examples/motion-principles/ kinetic manifesto: code → dot landscape → timing, rhythm, contrast, squash, morph
 examples/space-launch/ 60 s launch film for ft-motion: space story, saucer, product demo in a window, feature cards (EN / TR)
 examples/dot-launch/  72 s launch film for ft-motion: a bouncing dot, liquid and particle transitions, white product window with camera push-ins, feature cards (EN)
+examples/dotkesk-agents/ 64 s product film for dotkesk's AI agent builder: night-shift hook, rebuilt logo in orbit, real app UI redrawn from screenshots, flow editor demo (EN)
 docs/TECHNIQUES.md    recipes: timing, type, dot fields, morphs, UI, glass, impacts, sound
 docs/sound-and-tempo.html  interactive explainer: how the sound is synthesised, how motion locks to the beat (EN / TR)
 prompts/              brief-to-video prompt templates (EN / TR)

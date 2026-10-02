@@ -1,0 +1,17 @@
+{
+  "name": "dotkesk-agents",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "duration": 64,
+  "bpm": 120,
+  "speed": 1,
+  "lang": "en",
+  "subframes": 6,
+  "shutter": 0.5,
+  "fonts": {
+    "css": ["@fontsource/inter/400.css", "@fontsource/inter/500.css", "@fontsource/inter/600.css", "@fontsource/inter/700.css", "@fontsource/inter/800.css"],
+    "preload": ["400 40px Inter", "500 40px Inter", "600 40px Inter", "700 40px Inter", "800 40px Inter"],
+    "sample": "AaBbÇçĞğİıÖöŞşÜüÄäÉéÑñß0123456789·—›→…“”’⌘"
+  }
+}
