@@ -5,6 +5,8 @@
 //   node ft.mjs stills <project> <f,f,f|t1s,t2s>   PNG stills at frames (or seconds with an "s" suffix)
 //   node ft.mjs sheet <project> [count]            evenly spaced stills tiled into out/sheet.png
 //   node ft.mjs render <project>                   out/<name>.mp4 (muxes out/audio.wav if present)
+//   node ft.mjs lemo setup | lemo <command…>      lemo/: 51 film styles + production tools (see lemo/README.md); runs the command inside lemo/
+//   node ft.mjs anim <render.mjs flags>            hand-painted Clawd animation kit in animation/ (see animation/README.md)
 // options: --lang xx  --sub N (motion-blur subframes)  --crf N  --out file.mp4
 import http from 'node:http';
 import fs from 'node:fs';
@@ -20,6 +22,23 @@ const [cmd, target, ...rest] = process.argv.slice(2);
 const opt = (name, def) => { const i = rest.indexOf(`--${name}`); return i >= 0 ? rest[i + 1] : def; };
 const die = msg => { console.error(`\n  ✖ ${msg}\n`); process.exit(1); };
 if (!cmd || cmd === 'help' || cmd === '--help') { console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 9).map(l => l.replace(/^\/\/ ?/, '')).join('\n')); process.exit(0); }
+
+if (cmd === 'anim') {   // animation/ is a separate kit (p5 + p5.brush): run its renderer from inside it
+  const r = spawnSync(process.execPath, ['render.mjs', ...process.argv.slice(3)], { cwd: path.join(ROOT, 'animation'), stdio: 'inherit' });
+  process.exit(r.status ?? 1);
+}
+
+if (cmd === 'lemo') {   // lemo/ is the vendored lemo-opuscar toolkit: `setup` installs it, anything else runs inside lemo/ with Chrome and the venv found
+  const dir = path.join(ROOT, 'lemo'), env = { ...process.env };
+  const chrome = findChrome();
+  if (chrome && !env.PLAYWRIGHT_CHROME) env.PLAYWRIGHT_CHROME = chrome;
+  env.PATH = [path.join(dir, '.venv', process.platform === 'win32' ? 'Scripts' : 'bin'), env.PATH].join(path.delimiter);
+  const argv = process.argv.slice(3);
+  if (!argv.length) die('usage: node ft.mjs lemo setup [voice] [music]   |   node ft.mjs lemo <command…>   e.g. node ft.mjs lemo node core/render/still.mjs films/x 1.5');
+  const [bin, ...args] = argv[0] === 'setup' ? [process.execPath, 'setup.mjs', ...argv.slice(1)] : argv;
+  const r = spawnSync(bin, args, { cwd: dir, env, stdio: 'inherit', shell: process.platform === 'win32' && /^(npm|npx)$/.test(bin) });
+  process.exit(r.status ?? 1);
+}
 
 if (cmd === 'new') {
   if (!target) die('usage: node ft.mjs new <name>');

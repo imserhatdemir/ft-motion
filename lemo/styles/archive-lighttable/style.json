@@ -1,0 +1,18 @@
+{
+ "slug": "archive-lighttable",
+ "num": "62",
+ "en": "Archive Light Table",
+ "cn": "档案灯台",
+ "category_en": "Evidence Films",
+ "category_cn": "实证影像",
+ "film": "Two Seconds Short",
+ "line": "The telegram said the longest flight lasted 57 seconds and the newspaper printed it; under a loupe, the Wright brothers' glass negatives and the Library of Congress record say 59.",
+ "line_cn": "电报说最长一次飞了 57 秒，第二天报纸照登；放大镜下，莱特兄弟的玻璃底片和国会图书馆的记录说是 59 秒。",
+ "uses": [
+  "Brand history & anniversaries",
+  "Documentary & archive explainers",
+  "Museum & collection stories"
+ ],
+ "frame_sec": 22.3,
+ "dur": 40.0
+}

@@ -1,0 +1,18 @@
+{
+ "slug": "microscope",
+ "num": "61",
+ "en": "Microscope Story",
+ "cn": "显微叙事",
+ "category_en": "Evidence Films",
+ "category_cn": "实证影像",
+ "film": "Measured Blue",
+ "line": "One continuous camera takes a liver slide from the eye down to a single nucleus; two circles 1.4 mm apart are counted pixel by pixel, and one holds 2.4 times the blue.",
+ "line_cn": "一镜从肉眼看到的肝组织玻片推到单个细胞核；相隔 1.4 毫米的两个圆被逐像素计数，其中一个的蓝色是另一个的 2.4 倍。",
+ "uses": [
+  "Biomedicine & pathology",
+  "Materials & surface science",
+  "Skincare & cosmetic science"
+ ],
+ "frame_sec": 24.6,
+ "dur": 39.5
+}
