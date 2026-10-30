@@ -10,3 +10,4 @@ Thumbs.db
 .venv/
 lemo/films/
 !examples/dotkesk/voice/*.wav
+!examples/ft-promo/voice/*.wav
