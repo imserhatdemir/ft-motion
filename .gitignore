@@ -7,3 +7,6 @@ __pycache__/
 *.wav
 .DS_Store
 Thumbs.db
+.venv/
+lemo/films/
+!examples/dotkesk/voice/*.wav

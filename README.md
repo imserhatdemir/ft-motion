@@ -93,6 +93,8 @@ export default {
 | `node ft.mjs stills <project> 0,90,2.5s` | full-size PNGs at frames or seconds |
 | `node ft.mjs sheet <project> [n]` | `n` evenly spaced stills tiled into `out/sheet.png` |
 | `node ft.mjs render <project>` | mp4 (H.264, yuv420p, faststart; muxes `out/audio.wav` if present) |
+| `node ft.mjs anim <flags>` | the hand-painted character kit in `animation/` (see [its README](animation/README.md)) |
+| `node ft.mjs lemo setup` · `lemo <command…>` | the vendored film-style library in `lemo/` (see [its README](lemo/README.md)) |
 
 Options: `--lang xx` (passed to the scene as `api.lang`), `--sub N` (motion-blur subframes), `--crf N`, `--out name.mp4`.
 
@@ -115,6 +117,12 @@ examples/edit-demo/   an edit request, its real git diff and the before / after 
 examples/cat-crossing/ 3D cartoon short (three.js): a cat crossing a busy street
 examples/chat-commerce/ conversational-commerce promo: chat demo, manifesto, inbox, dots → logo, glass end card
 examples/motion-principles/ kinetic manifesto: code → dot landscape → timing, rhythm, contrast, squash, morph
+examples/earthquake/  30 s Turkish explainer Reel (how an earthquake happens), narrated, word-by-word captions
+examples/dinosaur/    30 s Turkish story Reel (the dinosaur extinction), narrated
+examples/dotkesk/     shared kit of the dotkesk daily series: rebuilt logo, hero glass, captions, chat UI, end card, voice, sound
+examples/dotkesk-NN/  the series' episodes (01–07): 9:16 English shorts for dotkesk.com
+animation/            second engine: hand-painted character animation (p5 + p5.brush, Clawd), from ClaudeAnimationBase (MIT)
+lemo/                 vendored Lemo-Opuscar library: 51 named film styles + production tools (MIT)
 docs/TECHNIQUES.md    recipes: timing, type, dot fields, morphs, UI, glass, impacts, sound
 docs/sound-and-tempo.html  interactive explainer: how the sound is synthesised, how motion locks to the beat (EN / TR)
 prompts/              brief-to-video prompt templates (EN / TR)
@@ -155,6 +163,28 @@ Because a scene is code, a revision is a diff you can read. [`examples/edit-demo
 ![Frames from the reel before and after the edit](docs/edit-demo-compare.jpg)
 
 The 30 s side-by-side video is itself an ft-motion project (the panel is drawn from `case/`, and `compose.mjs` overlays the two renders). See its [README](examples/edit-demo/README.md) to make one for your own edit.
+
+## A daily series for a real product: dotkesk
+
+![Frames from the dotkesk series](docs/dotkesk-preview.jpg)
+
+[`examples/dotkesk-01`](examples/dotkesk-01) … [`dotkesk-07`](examples/dotkesk-07) are 19–25 s vertical (1080×1920) English shorts for Instagram Reels and YouTube Shorts, made for [dotkesk.com](https://dotkesk.com), an AI agent for WhatsApp, Instagram and web-chat commerce. Each one shows one real feature from the site: answering at 2 a.m., order tracking, chat channels wired to ikas / Shopify / WooCommerce, setup in minutes, cart recovery with one-time codes, refunds with human handoff, and web chat. Each ends on the same card: the logo assembles, **Follow @dotkesk** is tapped, and a "Book a free demo" button.
+
+Everything the episodes share lives in [`examples/dotkesk`](examples/dotkesk/README.md):
+
+- **Brand from the site, not invented.** The colour tokens, Inter, the green pill CTA and the orbit logo are rebuilt from dotkesk.com. The logo is redrawn dash by dash from the PNG and checked against it with a difference overlay (`logo-check/`). The background is the landing hero's shader (Swirl + ChromaFlow + FlutedGlass + FilmGrain), rebuilt for Canvas 2D; its green light follows the action instead of the cursor. Light (default) and dark looks are switched with `"theme"` in `project.json`.
+- **A free, local, consistent narrator.** [`voice_lib.py`](examples/dotkesk/voice_lib.py) clones one reference clip with VoxCPM2 (Apache-2.0) on the GPU, makes three takes per line, and keeps the take that Whisper hears word for word. It then lays the lines on the timeline and writes `schedule.js`; scenes, captions and sound all key off those word times.
+- **Highs kept in check.** [`sfx.py`](examples/dotkesk/sfx.py) uses sine-based, low-passed UI sounds and dark hats. It de-esses the voice, ducks the music under every word, and masters to -14 LUFS through a gentle high shelf. It prints the 5–10 kHz and >10 kHz energy share on every mix.
+- **Never a still frame.** Every section has a slow push-in, the glass keeps drifting, and the end card keeps orbiting.
+- **A new episode is mostly copy.** `stage()`, `chatCard()`, `turnLogo()`, `payoff()` and `series_score()` carry the structure. An episode writes its lines, its middle scenes and its UI sounds. [`POSTS.md`](examples/dotkesk/POSTS.md) holds a caption and the placeholder list for each one.
+
+```bash
+C:\vox\Scripts\python.exe examples/dotkesk-02/voice.py   # a Python with torch (CUDA), voxcpm, transformers
+python examples/dotkesk-02/sound.py
+node ft.mjs render examples/dotkesk-02
+```
+
+The series keeps a 5 % film grain to match the site's hero, against the tip below. That costs about 40 % in file size (13–17 MB per episode).
 
 ## Tips
 

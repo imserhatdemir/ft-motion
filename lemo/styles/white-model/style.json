@@ -1,0 +1,18 @@
+{
+ "slug": "white-model",
+ "num": "58",
+ "en": "Projection on White Model",
+ "cn": "白模投影",
+ "category_en": "Evidence Films",
+ "category_cn": "实证影像",
+ "film": "How a Flattened City Grew Back",
+ "line": "A projector lights Rotterdam's white model layer by layer: what stood before 1940, the decades that filled the hole, the towers, and the winter shadow the tallest one casts on the pre-war roofs.",
+ "line_cn": "投影机把数据一层层刷上鹿特丹白模：1940 年前留下的楼、填满空洞的几十年、长起来的塔楼，以及最高那栋在冬至正午投向战前屋顶的影子。",
+ "uses": [
+  "Urban planning & real estate",
+  "Exhibitions & showrooms",
+  "City data & history"
+ ],
+ "frame_sec": 30.4,
+ "dur": 40.0
+}

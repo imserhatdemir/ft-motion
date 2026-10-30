@@ -9,7 +9,8 @@
     "stills": "node ft.mjs stills",
     "sheet": "node ft.mjs sheet",
     "render": "node ft.mjs render",
-    "new": "node ft.mjs new"
+    "new": "node ft.mjs new",
+    "anim": "node ft.mjs anim"
   },
   "dependencies": {
     "@fontsource/archivo-black": "^5.3.0",
@@ -17,6 +18,8 @@
     "@fontsource/fredoka": "^5.3.0",
     "@fontsource/inter": "^5.2.0",
     "@fontsource/jetbrains-mono": "^5.2.0",
+    "p5": "^2.3.3",
+    "p5.brush": "^2.2.3",
     "puppeteer-core": "^24.0.0",
     "three": "^0.186.1"
   },
