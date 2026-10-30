@@ -1,0 +1,30 @@
+{
+  "name": "dotkesk-04",
+  "width": 1080,
+  "height": 1920,
+  "fps": 60,
+  "duration": 23.75,
+  "bpm": 120,
+  "speed": 1,
+  "lang": "en",
+  "theme": "light",
+  "subframes": 6,
+  "shutter": 0.5,
+  "fonts": {
+    "css": [
+      "@fontsource/inter/300.css",
+      "@fontsource/inter/500.css",
+      "@fontsource/inter/600.css",
+      "@fontsource/inter/700.css",
+      "@fontsource/inter/800.css"
+    ],
+    "preload": [
+      "300 40px Inter",
+      "500 40px Inter",
+      "600 40px Inter",
+      "700 40px Inter",
+      "800 40px Inter"
+    ],
+    "sample": "AaBbCcGgJjPpQqYy0123456789@·—→✓:'?!.,"
+  }
+}

@@ -44,10 +44,14 @@ Requirements: Node 18+, Python 3.10+ with numpy and scipy, ffmpeg on PATH, and C
 - `ft.mjs`: CLI (static server, headless Chrome, ffmpeg).
 - `audio/ftsynth.py`: synthesis, timeline mixer, reverb, sidechain, mastering.
 - `audio/ftextras.py`: `stamp`, `counter_ticks`, `echo`, `glitch_burst`, `tick`, `tom`.
+- `animation/`: second engine for hand-painted character cartoons (p5 + p5.brush, Clawd), from ClaudeAnimationBase (MIT). `node ft.mjs anim …`; read `animation/ANIMATION_GUIDE.md` first. 1920x1080, no text by its own rules.
+- `lemo/`: the Lemo-Opuscar library: 51 named film styles (`styles/<slug>/STYLE.md`), director and build guides, production tools. Use it when a named style is asked for; read `lemo/README.md` first, then `lemo/AGENTS.md`. `node ft.mjs lemo setup|<command>`. ft-motion's storyboard-then-approval rule overrides upstream's defaults.
 - `examples/hello/`: reference scene using most techniques.
 - `examples/reel/`: 15 s, 128 BPM showcase of `fx.js` and `recipes.js` (wipes, glitch, tunnel, dot sphere, easing graph, typed code with a preview inside a preview), `sound.py` with `ftextras`; TR / EN.
 - `examples/edit-demo/`: 30 s, 4:5 side-by-side of an edit request, its real `git diff` (`case/change.patch`) and the BEFORE / AFTER renders of `examples/reel`. `scene.js` draws the panel from `case/`, `compose.mjs` overlays the two videos, `sound.py` scores the panel.
 - `examples/cat-crossing/`: three.js cartoon short (cel shading, ink lines, character rig, traffic, shot list).
 - `examples/chat-commerce/`, `examples/motion-principles/`: brandable 20 s promos (ported from ft-studio templates): copy in `COPY`, brand in `BRAND`, layout against `brandApi().fmt.safe`, 15 s choreography played at `speed` 0.75.
+- `examples/dotkesk/` + `examples/dotkesk-NN/`: daily 9:16 English shorts for dotkesk.com (01–07). Shared kit: light / dark themes, the landing hero's fluted glass (`heroGlass`, cached once per frame), rebuilt orbit logo, paged word-by-word captions, chat UI, end card with Follow @dotkesk + demo CTA, and `stage()` / `chatCard()` / `turnLogo()` / `payoff()` for new episodes. Narrator: VoxCPM2 cloning one reference clip, checked with Whisper, one GPU job at a time (`voice_lib.py`). Sound: `series_score` + soft, high-controlled UI sounds (`sfx.py`). See `examples/dotkesk/README.md`; `POSTS.md` has captions and placeholders.
+- `examples/earthquake/`, `examples/dinosaur/`: 30 s Turkish Reels with a voice-over by Ahenk (a VoxCPM2 LoRA, CC BY 4.0: keep the credit) and captions driven by the narration's word times.
 - `docs/TECHNIQUES.md`: recipes, with pointers into the example.
 - `docs/sound-and-tempo.html`: standalone interactive explainer (EN default, TR toggle) of how `ftsynth` builds each sound and how scenes lock to the beat grid. Copy lives in the `I` dictionary; the DSP mirrors `audio/ftsynth.py`, so change both together.

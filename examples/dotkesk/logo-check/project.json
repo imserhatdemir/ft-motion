@@ -1,0 +1,10 @@
+{
+  "name": "logo-check",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "duration": 2,
+  "bpm": 120,
+  "subframes": 1,
+  "fonts": { "css": ["@fontsource/inter/700.css"], "preload": ["700 40px Inter"] }
+}
