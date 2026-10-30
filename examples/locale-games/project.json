@@ -1,0 +1,28 @@
+{
+  "name": "locale-games",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "duration": 24,
+  "bpm": 120,
+  "speed": 1,
+  "subframes": 6,
+  "fonts": {
+    "css": [
+      "@fontsource/exo-2/800.css",
+      "@fontsource/exo-2/900.css",
+      "@fontsource/inter/400.css",
+      "@fontsource/inter/500.css",
+      "@fontsource/inter/600.css",
+      "@fontsource/inter/700.css"
+    ],
+    "preload": [
+      "800 40px 'Exo 2'",
+      "900 40px 'Exo 2'",
+      "400 40px Inter",
+      "500 40px Inter",
+      "600 40px Inter",
+      "700 40px Inter"
+    ]
+  }
+}

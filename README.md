@@ -121,6 +121,7 @@ examples/earthquake/  30 s Turkish explainer Reel (how an earthquake happens), n
 examples/dinosaur/    30 s Turkish story Reel (the dinosaur extinction), narrated
 examples/dotkesk/     shared kit of the dotkesk daily series: rebuilt logo, hero glass, captions, chat UI, end card, voice, sound
 examples/dotkesk-NN/  the series' episodes (01–07): 9:16 English shorts for dotkesk.com
+examples/locale-games/ 24 s landing-page showcase for X (16:9): the page played like a game, designer credits
 animation/            second engine: hand-painted character animation (p5 + p5.brush, Clawd), from ClaudeAnimationBase (MIT)
 lemo/                 vendored Lemo-Opuscar library: 51 named film styles + production tools (MIT)
 docs/TECHNIQUES.md    recipes: timing, type, dot fields, morphs, UI, glass, impacts, sound
@@ -186,6 +187,19 @@ node ft.mjs render examples/dotkesk-02
 
 The series keeps a 5 % film grain to match the site's hero, against the tip below. That costs about 40 % in file size (13–17 MB per episode).
 
+## A landing page, played like a game
+
+![Frames from examples/locale-games](docs/locale-games-preview.jpg)
+
+[`examples/locale-games`](examples/locale-games/README.md) is a 24 s, 16:9 video for X and a UI/UX portfolio. It presents the Locale Games landing page, designed by Şimal Su Erdoğan. The page is rebuilt in code inside a browser window, so every headline, card and field can move on its own. It is played like a game: PRESS START, the hook's two glowing eyes become the hero robot's eyes, each section is a level with a HUD (level, progress, score), the cards land on eighth notes for +100 each, a short design-system beat shows the tokens, the contact form fills and sends, and the footer's sunset ends on LEVEL COMPLETE and the designer's credits.
+
+```bash
+python examples/locale-games/sound.py
+node ft.mjs render examples/locale-games
+```
+
+The images in its `assets/` folder belong to the designer and are not covered by the MIT license.
+
 ## Tips
 
 - Leave film grain out. It multiplies file size and every platform re-encodes it into blotches.
@@ -194,4 +208,4 @@ The series keeps a 5 % film grain to match the site's hero, against the tip belo
 
 ## License
 
-MIT (see [LICENSE](LICENSE)). Fonts are distributed under their own licenses (Inter, JetBrains Mono and Barlow Condensed: SIL Open Font License).
+MIT (see [LICENSE](LICENSE)). Fonts are distributed under their own licenses (Inter, JetBrains Mono, Barlow Condensed and Exo 2: SIL Open Font License). The images in `examples/locale-games/assets/` are the designer's work and are not covered by the MIT license.

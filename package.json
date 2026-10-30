@@ -15,6 +15,7 @@
   "dependencies": {
     "@fontsource/archivo-black": "^5.3.0",
     "@fontsource/barlow-condensed": "^5.3.0",
+    "@fontsource/exo-2": "^5.3.0",
     "@fontsource/fredoka": "^5.3.0",
     "@fontsource/inter": "^5.2.0",
     "@fontsource/jetbrains-mono": "^5.2.0",
