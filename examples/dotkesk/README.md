@@ -10,6 +10,8 @@ This folder is the shared kit. Episodes live next to it as `examples/dotkesk-NN/
 | `voice_lib.py` | the narrator: VoxCPM2 cloning `voice/brand_voice_A.wav`, 3 takes per line, Whisper picks the clean one, writes `out/narration.wav` + `schedule.js` + the duration. Only one episode holds the GPU at a time (`out/gpu.lock`); an episode whose narration is newer than its `voice.py` is skipped (`FORCE=1` redoes it) |
 | `sfx.py` | `series_score` (chords, the turn on "dotkesk", groove, payoff, end card) and `ui()` events for episodes 02+, soft UI sounds, de-esser, music ducking under the voice, high shelf + loudnorm (-14 LUFS, -1.5 dBTP), prints the 5–10 kHz / >10 kHz energy share |
 | `voice/brand_voice_A.wav` | the series voice (voice A, "warm, confident"). Keep it: every episode clones it |
+| `BRIEF.md` | the brand and social-media brief (Turkish). Read it before writing an episode; its last section turns it into rules for the videos and lists what to verify |
+| `NEXT-EPISODES.md` | episodes 08–13, written against the brief but not produced yet: narration as `LINES`, the picture line by line, the kit pieces needed, a claims check, captions and open questions |
 | `POSTS.md` | posting sheet: topic, placeholders and an Instagram caption per episode |
 | `assets/dotkesk-orbit-logo.png` | the site logo, used only by `logo-check/` |
 | `logo-check/` | the rebuilt logo next to the PNG and a difference overlay: `node ft.mjs stills examples/dotkesk/logo-check 0s` |

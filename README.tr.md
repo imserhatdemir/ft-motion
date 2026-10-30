@@ -75,8 +75,15 @@ node ft.mjs render examples/reel --lang tr
 
 **Düzenleme isteği, gerçek diff ve sonuç:** Sahne kod olduğu için bir revizyon okunabilir bir diff'tir. [`examples/edit-demo`](examples/edit-demo) tek bir gerçek turu gösterir: *"Reel'i 150 BPM'e çıkar ve vurgu rengini mercandan elektrik mavisine çevir. Ses senkronda kalsın."* isteği, bunu karşılayan [taslak PR](https://github.com/imserhatdemir/ft-motion/pull/5) ([`case/change.patch`](examples/edit-demo/case/change.patch)) ve önce/sonra videoları yan yana. `project.json`'daki tek bir sayı hem görüntüyü hem sesi yeniden zamanladı. Diff'in geri kalanı bunun kendiliğinden yetişmediği yerler: eski renge düşen yedi yardımcı, sabit yazılmış `128 BPM` etiketi, "900 kare" diyen metinler ve mutlak bir saniyeye bağlı tek bir ses olayı. Kendi düzenlemen için [README](examples/edit-demo/README.md)'ye bak.
 
+**Oyun gibi oynanan bir landing page:** [`examples/locale-games`](examples/locale-games/README.md), X ve bir UI/UX portföyü için 24 saniyelik, 16:9 bir video. Şimal Su Erdoğan'ın tasarladığı Locale Games landing page'ini tanıtıyor. Sayfa bir tarayıcı penceresinin içinde kodla yeniden çizildiği için her başlık, kart ve form alanı ayrı ayrı hareket edebiliyor. Sayfa bir oyun gibi oynanıyor: PRESS START ekranındaki iki parlayan göz hero robotunun gözlerine dönüşüyor, her bölüm bir level oluyor ve bir HUD level, ilerleme ve skoru gösteriyor. Kartlar sekizlik notalara oturuyor ve her biri +100 puan getiriyor. Kısa bir tasarım sistemi anı renkleri ve tipografiyi gösteriyor, iletişim formu doldurulup gönderiliyor. Footer'daki gün batımı LEVEL COMPLETE ve tasarımcı kredisiyle bitiyor. `assets/` klasöründeki görseller tasarımcıya aittir ve MIT lisansı kapsamında değildir.
+
+```bash
+python examples/locale-games/sound.py
+node ft.mjs render examples/locale-games
+```
+
 Teknik tarifler için [`docs/TECHNIQUES.md`](docs/TECHNIQUES.md) dosyasına bak.
 
 ## Lisans
 
-MIT ([LICENSE](LICENSE)). Fontlar kendi lisanslarıyla dağıtılır (Inter, JetBrains Mono ve Barlow Condensed: SIL Open Font License).
+MIT ([LICENSE](LICENSE)). Fontlar kendi lisanslarıyla dağıtılır (Inter, JetBrains Mono, Barlow Condensed ve Exo 2: SIL Open Font License). `examples/locale-games/assets/` içindeki görseller tasarımcının eseridir ve MIT lisansı kapsamında değildir.
